@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from 'cors'
 
+import userRoutes from "./routes/user.routes.js";
+
 dotenv.config()
 const app = express()
 const port = 8002
@@ -14,6 +16,7 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(cookieParser())
+app.use('/user', userRoutes)
 
 app.get('/', (req, res) => {
   res.send('Hello from server')

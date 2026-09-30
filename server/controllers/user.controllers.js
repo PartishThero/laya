@@ -21,7 +21,7 @@ export const registerUser = async (req, res) => {
             uppercase: /[A-Z]/.test(password),
             lowercase: /[a-z]/.test(password),
             number: /\d/.test(password),
-            specialChar: /[@$!%*?&]/.test(password),
+            specialChar: /[#@$!%*?&]/.test(password),
         }
         const isPasswordValid = Object.values(passwordChecks).every(Boolean);
         if (!isPasswordValid) {
