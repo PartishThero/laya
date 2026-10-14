@@ -18,17 +18,34 @@ export function DragProvider({ children }) {
   const { playTrackDirect, currentTrack } = usePlayer();
   const { addToast } = useToast();
   const { isAuthenticated } = useAuth();
+  const canvasDropHandlerRef = useRef(null);
+
+  const registerCanvasDropHandler = useCallback((handler) => {
+    canvasDropHandlerRef.current = handler;
+    return () => {
+      canvasDropHandlerRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     return dragController.subscribe(setDragState);
   }, []);
 
   const handleDrop = useCallback(async () => {
-    const { card, target, status } = dragController.state;
+    const { card, origin, current, target, status } = dragController.state;
     if (status === DRAG_STATES.IDLE || !card) return;
 
     if (!target) {
-      // Dropped on empty canvas -> cancel
+      // If dropped on the spatial canvas, allow the canvas to place it
+      if (canvasDropHandlerRef.current && current && origin) {
+        const handled = canvasDropHandlerRef.current({ card, origin, current });
+        if (handled) {
+          dragController.reset();
+          return;
+        }
+      }
+
+      // Dropped on empty space outside canvas or unhandled -> cancel
       dragController.cancel();
       return;
     }
@@ -134,7 +151,7 @@ export function DragProvider({ children }) {
   }, [queueCard, playTrackDirect, currentTrack, addToast, isAuthenticated]);
 
   return (
-    <DragContext.Provider value={{ dragState, handleDrop, hitTester }}>
+    <DragContext.Provider value={{ dragState, handleDrop, hitTester, registerCanvasDropHandler }}>
       {children}
     </DragContext.Provider>
   );

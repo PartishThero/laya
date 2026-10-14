@@ -8,7 +8,7 @@ import { PlaylistCard } from '@/components/cards/PlaylistCard.jsx';
 
 export function DragLayer() {
   const { dragState, handleDrop } = useDrag();
-  const { status, card, current, target } = dragState;
+  const { status, card, current, target, origin } = dragState;
 
   useEffect(() => {
     if (status === DRAG_STATES.IDLE) return;
@@ -17,12 +17,20 @@ export function DragLayer() {
       handleDrop();
     };
 
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        dragController.cancel();
+      }
+    };
+
     window.addEventListener('pointerup', handlePointerUpGlobal);
     window.addEventListener('pointercancel', handlePointerUpGlobal);
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('pointerup', handlePointerUpGlobal);
       window.removeEventListener('pointercancel', handlePointerUpGlobal);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [status, handleDrop]);
 
@@ -31,6 +39,9 @@ export function DragLayer() {
   }
 
   const isOverTarget = status === DRAG_STATES.OVER_TARGET || status === DRAG_STATES.DROPPED_PENDING;
+  const offsetX = origin?.offsetX ?? 100;
+  const offsetY = origin?.offsetY ?? 100;
+  const tilt = isOverTarget ? 0 : (origin?.tilt ?? 2);
 
   return (
     <div
@@ -40,10 +51,10 @@ export function DragLayer() {
       <div
         className="absolute top-0 left-0 transition-transform duration-75 pointer-events-none"
         style={{
-          transform: `translate3d(${current.screenX - 70}px, ${current.screenY - 70}px, 0) scale(${
+          transform: `translate3d(${current.screenX - offsetX}px, ${current.screenY - offsetY}px, 0) scale(${
             isOverTarget ? 0.92 : 1.05
-          }) rotate(${isOverTarget ? 0 : 2}deg)`,
-          filter: 'drop-shadow(0 16px 28px rgba(0,0,0,0.22))'
+          }) rotate(${tilt}deg)`,
+          filter: 'drop-shadow(0 20px 36px rgba(0,0,0,0.26))'
         }}
       >
         {card.kind === 'album' ? (

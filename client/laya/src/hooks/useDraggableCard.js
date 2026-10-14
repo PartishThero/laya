@@ -5,6 +5,7 @@ import { hitTester } from '@/lib/dnd/hitTest.js';
 
 export function useDraggableCard({ card, onClick, tilt = 0, onPanCanvas }) {
   const pointerStartRef = useRef(null);
+  const pointerOffsetRef = useRef(null);
   const isDraggingCardRef = useRef(false);
   const longPressTimerRef = useRef(null);
 
@@ -21,12 +22,23 @@ export function useDraggableCard({ card, onClick, tilt = 0, onPanCanvas }) {
   const startDrag = useCallback((e, startPoint) => {
     isDraggingCardRef.current = true;
 
+    const grab = pointerOffsetRef.current || {
+      offsetX: 100,
+      offsetY: 100,
+      width: 200,
+      height: 200
+    };
+
     // DragController owns the auto-pan requestAnimationFrame loop
     dragController.startLift(
       card,
       {
         screenX: startPoint.x,
         screenY: startPoint.y,
+        offsetX: grab.offsetX,
+        offsetY: grab.offsetY,
+        width: grab.width,
+        height: grab.height,
         tilt
       },
       onPanCanvas
@@ -37,7 +49,17 @@ export function useDraggableCard({ card, onClick, tilt = 0, onPanCanvas }) {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
 
     pointerStartRef.current = { x: e.clientX, y: e.clientY };
-    isDraggingCardRef.current = false;
+    isDraggingRef.current = false;
+
+    if (e.currentTarget) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      pointerOffsetRef.current = {
+        offsetX: e.clientX - rect.left,
+        offsetY: e.clientY - rect.top,
+        width: rect.width,
+        height: rect.height
+      };
+    }
 
     // For touch devices: long-press ~250ms picks up card
     if (e.pointerType === 'touch') {

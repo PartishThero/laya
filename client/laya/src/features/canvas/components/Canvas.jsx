@@ -1,11 +1,13 @@
 // components/canvas/Canvas.jsx
-import React, { useRef, useMemo, useCallback } from 'react';
+import React, { useRef, useMemo, useCallback, useEffect } from 'react';
 import { useCanvasViewport } from '@/features/canvas/hooks/useCanvasViewport.js';
 import { useChunkCards } from '@/features/canvas/hooks/useChunkCards.js';
+import { useCardPositions } from '@/features/canvas/hooks/useCardPositions.js';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts.js';
 import { usePrefs } from '@/app/providers/PrefsContext.jsx';
 import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
-import { getVisibleWorldBounds } from '@/features/canvas/engines/viewport.js';
+import { useDrag } from '@/app/providers/DragContext.jsx';
+import { getVisibleWorldBounds, screenToWorld } from '@/features/canvas/engines/viewport.js';
 import { getVisibleChunkCoords } from '@/features/canvas/engines/chunks.js';
 import { CanvasBackground } from '@/features/canvas/components/CanvasBackground.jsx';
 import { Chunk } from '@/features/canvas/components/Chunk.jsx';
@@ -19,6 +21,8 @@ export function Canvas({ mode = 'home' }) {
   const containerRef = useRef(null);
   const { isListView } = usePrefs();
   const { playCard } = usePlayer();
+  const { registerCanvasDropHandler } = useDrag();
+  const { positions, movedCardsList, moveCard, isCardMoved } = useCardPositions(mode);
 
   const {
     viewport,
@@ -29,6 +33,27 @@ export function Canvas({ mode = 'home' }) {
     handlePointerMove,
     handlePointerUp
   } = useCanvasViewport(containerRef);
+
+  const viewportRef = useRef(viewport);
+  viewportRef.current = viewport;
+
+  // Handle dropping cards anywhere on the infinite canvas
+  useEffect(() => {
+    const handleCanvasDrop = ({ card, origin, current }) => {
+      const vp = viewportRef.current;
+      const offsetX = origin?.offsetX ?? 100;
+      const offsetY = origin?.offsetY ?? 100;
+
+      const screenLeft = current.screenX - offsetX;
+      const screenTop = current.screenY - offsetY;
+
+      const world = screenToWorld(screenLeft, screenTop, vp);
+      moveCard(card, world.x, world.y, origin?.tilt ?? 0);
+      return true;
+    };
+
+    return registerCanvasDropHandler(handleCanvasDrop);
+  }, [registerCanvasDropHandler, moveCard]);
 
   // Keyboard navigation
   useKeyboardShortcuts({
@@ -68,14 +93,17 @@ export function Canvas({ mode = 'home' }) {
 
   const isAtOrigin = Math.abs(viewport.x) < 80 && Math.abs(viewport.y) < 80;
 
-  // Flatten cards for accessible List View
+  // Flatten cards for accessible List View (including user-moved cards)
   const allCardsList = useMemo(() => {
-    const list = [];
+    const map = new Map();
     chunks.forEach(placedList => {
-      placedList.forEach(p => list.push(p.card));
+      placedList.forEach(p => map.set(p.card.id, p.card));
     });
-    return list;
-  }, [chunks]);
+    movedCardsList.forEach(item => {
+      map.set(item.card.id, item.card);
+    });
+    return Array.from(map.values());
+  }, [chunks, movedCardsList]);
 
   return (
     <div
@@ -145,17 +173,36 @@ export function Canvas({ mode = 'home' }) {
               transformOrigin: '0 0'
             }}
           >
-            {/* Render spatial chunks */}
+            {/* Render spatial chunks (excluding user-moved cards) */}
             {visibleChunks.map(({ cx, cy, key }) => (
               <Chunk
                 key={key}
                 cx={cx}
                 cy={cy}
-                placedCards={chunks.get(key) || []}
+                placedCards={(chunks.get(key) || []).filter(item => !isCardMoved(item.card.id))}
                 isLoading={loadingChunks.has(key)}
                 onCardClick={(c) => playCard(c, allCardsList)}
                 onPanCanvas={panBy}
               />
+            ))}
+
+            {/* User-moved physical cards positioned anywhere on canvas */}
+            {movedCardsList.map(item => (
+              <div
+                key={item.card.id}
+                className="absolute pointer-events-auto"
+                style={{
+                  transform: `translate3d(${item.worldX}px, ${item.worldY}px, 0)`,
+                  zIndex: item.zIndex || 50
+                }}
+              >
+                <Card
+                  card={item.card}
+                  tilt={item.tilt}
+                  onClick={(c) => playCard(c, allCardsList)}
+                  onPanCanvas={panBy}
+                />
+              </div>
             ))}
 
             {/* Roaming drop zone tray placed in the world plane */}
