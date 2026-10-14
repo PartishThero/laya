@@ -1,5 +1,5 @@
 // components/zones/PlaylistDock.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { usePrefs } from '@/app/providers/PrefsContext.jsx';
 import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { useDropZone } from '@/hooks/useDropZone.js';
@@ -11,6 +11,17 @@ import { toCard } from '@/models/card.model.js';
 
 function DockPlaylistSlot({ playlist, onRefresh }) {
   const [stamp, setStamp] = useState('idle');
+  const stampTimeoutRef = useRef(null);
+
+  // Clean up stamp timeout on unmount (BUG-09)
+  useEffect(() => {
+    return () => {
+      if (stampTimeoutRef.current) {
+        clearTimeout(stampTimeoutRef.current);
+        stampTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const { zoneRef, isOver, isNear } = useDropZone({
     id: `playlist-dock-${playlist._id || playlist.id}`,
@@ -21,7 +32,8 @@ function DockPlaylistSlot({ playlist, onRefresh }) {
       onSuccess: () => {
         setStamp('confirmed');
         if (onRefresh) onRefresh();
-        setTimeout(() => setStamp('idle'), 2500);
+        if (stampTimeoutRef.current) clearTimeout(stampTimeoutRef.current);
+        stampTimeoutRef.current = setTimeout(() => setStamp('idle'), 2500);
       }
     }
   });
@@ -80,7 +92,23 @@ export function PlaylistDock() {
   };
 
   useEffect(() => {
-    loadPlaylists();
+    let active = true;
+    if (isAuthenticated) {
+      playlistsApi.getMyPlaylists()
+        .then(data => {
+          if (active) setPlaylists(data);
+        })
+        .catch(() => {});
+    } else {
+      playlistsApi.getPublicPlaylists()
+        .then(data => {
+          if (active) setPlaylists(data);
+        })
+        .catch(() => {});
+    }
+    return () => {
+      active = false;
+    };
   }, [isAuthenticated]);
 
   const handleCreateNew = async (e) => {

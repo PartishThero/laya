@@ -1,5 +1,5 @@
 // components/zones/RoamingZone.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { roamingZoneEngine } from '@/features/library/engines/roamingZoneEngine.js';
 import { useDropZone } from '@/hooks/useDropZone.js';
 import { playlistsApi } from '@/services/api/playlists.api.js';
@@ -15,19 +15,21 @@ export function RoamingZone({ viewport }) {
   const [stamp, setStamp] = useState('idle');
   const [pos, setPos] = useState(roamingZoneEngine.position);
   const [showBearing, setShowBearing] = useState(false);
+  const stampTimeoutRef = useRef(null);
 
   useEffect(() => {
+    let active = true;
     // Fetch a public playlist or user's playlist to attach to roaming tray
     if (isAuthenticated) {
       playlistsApi.getMyPlaylists()
         .then(pls => {
-          if (pls.length > 0) setPlaylist(pls[0]);
+          if (active && pls.length > 0) setPlaylist(pls[0]);
         })
         .catch(() => {});
     } else {
       playlistsApi.getPublicPlaylists()
         .then(pls => {
-          if (pls.length > 0) setPlaylist(pls[0]);
+          if (active && pls.length > 0) setPlaylist(pls[0]);
         })
         .catch(() => {});
     }
@@ -39,8 +41,21 @@ export function RoamingZone({ viewport }) {
       }
     }, 5000);
 
-    return () => clearInterval(timer);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
   }, [isAuthenticated]);
+
+  // Clean up stamp timeout on unmount (BUG-09)
+  useEffect(() => {
+    return () => {
+      if (stampTimeoutRef.current) {
+        clearTimeout(stampTimeoutRef.current);
+        stampTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const { zoneRef, isOver, isNear } = useDropZone({
     id: 'roaming-zone-crate',
@@ -51,7 +66,8 @@ export function RoamingZone({ viewport }) {
       onSuccess: () => {
         setStamp('confirmed');
         addToast('Found and filled the wandering crate!', 'success');
-        setTimeout(() => {
+        if (stampTimeoutRef.current) clearTimeout(stampTimeoutRef.current);
+        stampTimeoutRef.current = setTimeout(() => {
           setStamp('idle');
           // Relocate to a new random location
           const nextPos = roamingZoneEngine.relocate(viewport);

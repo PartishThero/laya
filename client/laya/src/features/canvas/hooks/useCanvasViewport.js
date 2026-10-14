@@ -5,18 +5,31 @@ import { PanMomentumTracker } from '@/features/canvas/engines/momentum.js';
 
 export function useCanvasViewport(containerRef) {
   const [viewport, setViewport] = useState({ x: 0, y: 0, scale: 1.0 });
+  const viewportRef = useRef(viewport);
+  viewportRef.current = viewport;
+
   const isDraggingRef = useRef(false);
   const lastPointerRef = useRef({ x: 0, y: 0 });
   const momentumTracker = useRef(new PanMomentumTracker());
   const animationFrameRef = useRef(null);
 
+  // Cancel any running animation loop when unmounting (BUG-08)
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
+  }, []);
+
   // Smooth return home glide
   const glideToOrigin = useCallback(() => {
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
 
-    const startX = viewport.x;
-    const startY = viewport.y;
-    const startScale = viewport.scale;
+    const startX = viewportRef.current.x;
+    const startY = viewportRef.current.y;
+    const startScale = viewportRef.current.scale;
     const targetScale = 1.0;
     const startTime = performance.now();
     const duration = 500;
@@ -39,7 +52,7 @@ export function useCanvasViewport(containerRef) {
     };
 
     animationFrameRef.current = requestAnimationFrame(animate);
-  }, [viewport]);
+  }, []);
 
   // Pan by dx, dy
   const panBy = useCallback((dx, dy) => {
@@ -91,6 +104,7 @@ export function useCanvasViewport(containerRef) {
     const speed = Math.sqrt(vx * vx + vy * vy);
 
     if (speed > 0.15) {
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
       let currentVx = vx * 18;
       let currentVy = vy * 18;
 

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { searchApi } from '@/services/api/search.api.js';
 import { toCard } from '@/models/card.model.js';
 import { Card } from '@/components/cards/Card.jsx';
-import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
+import { usePlayerActions } from '@/features/player/context/PlayerContext.jsx';
 import { Search as SearchIcon, Loader2 } from 'lucide-react';
 
 export default function Search() {
@@ -11,31 +11,43 @@ export default function Search() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState({ songs: [], albums: [], artists: [] });
   const [error, setError] = useState(null);
-  const { playCard } = usePlayer();
+  const { playCard } = usePlayerActions();
 
   useEffect(() => {
     if (!query.trim()) {
       setResults({ songs: [], albums: [], artists: [] });
       setLoading(false);
+      setError(null);
       return;
     }
+
+    const controller = new AbortController();
 
     const timer = setTimeout(async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await searchApi.searchAll(query.trim());
+        const res = await searchApi.searchAll(query.trim(), { signal: controller.signal });
+        if (controller.signal.aborted) return;
         const songs = (res.songs || []).map(s => toCard(s, 'song'));
         const albums = (res.albums || []).map(a => toCard(a, 'album'));
         setResults({ songs, albums, artists: res.artists || [] });
       } catch (err) {
+        if (controller.signal.aborted || err.name === 'AbortError') {
+          return;
+        }
         setError(err.message || 'Search request failed');
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     }, 280);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [query]);
 
   const allResultCards = [...results.songs, ...results.albums];
