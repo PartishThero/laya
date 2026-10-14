@@ -4,12 +4,12 @@ import { SongCard } from './SongCard.jsx';
 import { AlbumCard } from './AlbumCard.jsx';
 import { PlaylistCard } from './PlaylistCard.jsx';
 import { CardGhost } from './CardGhost.jsx';
-import { useDraggableCard } from '../../hooks/useDraggableCard.js';
+import { useDraggableCard } from '@/hooks/useDraggableCard.js';
 import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { useDrag } from '@/app/providers/DragContext.jsx';
 import { useQueue } from '@/features/player/context/QueueContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
-import { cardLabel } from '../../models/card.model.js';
+import { cardLabel } from '@/models/card.model.js';
 
 export function Card({ card, tilt = 0, onClick, onPanCanvas }) {
   const { currentTrack } = usePlayer();

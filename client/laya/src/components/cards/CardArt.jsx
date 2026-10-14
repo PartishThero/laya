@@ -1,6 +1,6 @@
 // components/cards/CardArt.jsx
 import React, { useState } from 'react';
-import { fallbackArt } from '../../models/card.model.js';
+import { fallbackArt } from '@/models/card.model.js';
 
 // `bare` removes the thin border so the art can sit flush inside VinylCard.
 export function CardArt({ card, className = '', alt = '', bare = false }) {

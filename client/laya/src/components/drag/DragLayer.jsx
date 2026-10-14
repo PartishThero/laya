@@ -2,9 +2,9 @@
 import React, { useEffect } from 'react';
 import { useDrag } from '@/app/providers/DragContext.jsx';
 import { DRAG_STATES } from '@/lib/dnd/dragController.js';
-import { SongCard } from '../cards/SongCard.jsx';
-import { AlbumCard } from '../cards/AlbumCard.jsx';
-import { PlaylistCard } from '../cards/PlaylistCard.jsx';
+import { SongCard } from '@/components/cards/SongCard.jsx';
+import { AlbumCard } from '@/components/cards/AlbumCard.jsx';
+import { PlaylistCard } from '@/components/cards/PlaylistCard.jsx';
 
 export function DragLayer() {
   const { dragState, handleDrop } = useDrag();

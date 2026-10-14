@@ -1,6 +1,6 @@
 // components/cards/CardGhost.jsx
 import React from 'react';
-import { cardSize } from '../../models/card.model.js';
+import { cardSize } from '@/models/card.model.js';
 
 export function CardGhost({ kind, tilt = 0 }) {
   const size = cardSize(kind);
