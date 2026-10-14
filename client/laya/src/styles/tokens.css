@@ -1,0 +1,107 @@
+/* ─────────────────────────────────────────────────────────
+   Laya Design Tokens
+   Warm editorial analog — paper, ink, restraint.
+   ───────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Surface ─────────────────────────── */
+  --paper:        #EDE6D8;
+  --paper-2:      #E2D9C7;
+  --paper-3:      #D6CCBA;
+
+  /* ── Ink ─────────────────────────────── */
+  --ink:          #1D1B18;
+  --ink-soft:     #5B554B;
+  --ink-faint:    #8E8678;
+
+  /* ── Rules & borders ─────────────────── */
+  --rule:         rgba(29, 27, 24, .18);
+  --rule-strong:  rgba(29, 27, 24, .35);
+
+  /* ── Accent ──────────────────────────── */
+  --accent:       #B4532A;
+  --accent-soft:  rgba(180, 83, 42, .15);
+
+  /* ── Feedback ────────────────────────── */
+  --success:      #5E6B4A;
+  --danger:       #9C2F2F;
+  --warning:      #A67C3D;
+
+  /* ── Grain ───────────────────────────── */
+  --grain-opacity: .06;
+
+  /* ── Shadow ──────────────────────────── */
+  --shadow-card:    0 1px 3px rgba(29,27,24,.12), 0 4px 12px rgba(29,27,24,.08);
+  --shadow-lifted:  0 6px 20px rgba(29,27,24,.18), 0 2px 6px rgba(29,27,24,.10);
+
+  /* ── Typography ──────────────────────── */
+  --font-serif:    'Libron', 'Georgia', 'Times New Roman', serif;
+  --font-sans:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:     'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+  --text-xs:   0.6875rem;    /* 11px */
+  --text-sm:   0.8125rem;    /* 13px */
+  --text-base: 0.9375rem;    /* 15px */
+  --text-md:   1.0625rem;    /* 17px */
+  --text-lg:   1.25rem;      /* 20px */
+  --text-xl:   1.625rem;     /* 26px */
+  --text-2xl:  2.125rem;     /* 34px */
+
+  /* ── Spacing ─────────────────────────── */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ── Motion ──────────────────────────── */
+  --ease-out:     cubic-bezier(.22, 1, .36, 1);
+  --ease-spring:  cubic-bezier(.34, 1.56, .64, 1);
+  --ease-smooth:  cubic-bezier(.4, 0, .2, 1);
+  --dur-fast:     120ms;
+  --dur-normal:   200ms;
+  --dur-settle:   350ms;
+  --dur-slow:     500ms;
+
+  /* ── Card dimensions ─────────────────── */
+  --card-song-w:   180px;
+  --card-song-h:   210px;
+  --card-album-w:  240px;
+  --card-album-h:  280px;
+  --card-playlist-w: 200px;
+  --card-playlist-h: 160px;
+
+  /* ── Z-index layers ──────────────────── */
+  --z-canvas:   1;
+  --z-chrome:   100;
+  --z-player:   200;
+  --z-dock:     300;
+  --z-drag:     1000;
+  --z-toast:    1100;
+  --z-modal:    1200;
+
+  /* ── Layout ──────────────────────────── */
+  --nav-height:   52px;
+  --player-height: 80px;
+}
+
+/* ── Night theme ───────────────────────── */
+[data-theme="night"] {
+  --paper:        #1A1814;
+  --paper-2:      #24211B;
+  --paper-3:      #2E2A23;
+  --ink:          #ECE4D4;
+  --ink-soft:     #A39A89;
+  --ink-faint:    #6D6459;
+  --rule:         rgba(236, 228, 212, .16);
+  --rule-strong:  rgba(236, 228, 212, .28);
+  --accent:       #D9764A;
+  --accent-soft:  rgba(217, 118, 74, .15);
+  --shadow-card:  0 1px 3px rgba(0,0,0,.30), 0 4px 12px rgba(0,0,0,.22);
+  --shadow-lifted:0 6px 20px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.20);
+}

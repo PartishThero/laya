@@ -1,0 +1,56 @@
+import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import songRoutes from './routes/songRoutes.js';
+import artistRoutes from './routes/artistRoutes.js';
+import albumRoutes from './routes/albumRoutes.js';
+import playlistRoutes from './routes/playlistRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import searchRoutes from './routes/searchRoutes.js';
+import { getDiscovery } from './controllers/searchController.js';
+import errorMiddleware from './middleware/errorMiddleware.js';
+
+dotenv.config();
+connectDB();
+
+const app = express();
+
+const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+app.use(cors({
+  origin: [clientOrigin, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+  credentials: true
+}));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(morgan('dev'));
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
+
+// Primary REST routes
+app.use('/api/auth', authRoutes);
+app.use('/api/songs', songRoutes);
+app.use('/api/artists', artistRoutes);
+app.use('/api/albums', albumRoutes);
+app.use('/api/playlists', playlistRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/search', searchRoutes);
+app.get('/api/discover', getDiscovery);
+
+// 404 central handler
+app.use((req, res) => {
+  res.status(404).json({ message: `Route not found: ${req.method} ${req.originalUrl}` });
+});
+
+// Central error handler
+app.use(errorMiddleware);
+
+export default app;
