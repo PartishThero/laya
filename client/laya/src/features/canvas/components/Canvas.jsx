@@ -37,12 +37,22 @@ export function Canvas({ mode = 'home' }) {
     onZoom: zoomBy
   });
 
-  // Calculate visible bounds and chunk coordinates
+  // Calculate visible bounds and chunk coordinates (stabilize reference if keys unchanged)
+  const prevVisibleChunksRef = useRef([]);
   const visibleChunks = useMemo(() => {
     const width = window.innerWidth || 1200;
     const height = window.innerHeight || 800;
     const bounds = getVisibleWorldBounds(viewport, width, height, 500);
-    return getVisibleChunkCoords(bounds);
+    const coords = getVisibleChunkCoords(bounds);
+    const prev = prevVisibleChunksRef.current;
+    if (
+      prev.length === coords.length &&
+      prev.every((p, i) => p.key === coords[i].key)
+    ) {
+      return prev;
+    }
+    prevVisibleChunksRef.current = coords;
+    return coords;
   }, [viewport]);
 
   // Load cards for visible chunks

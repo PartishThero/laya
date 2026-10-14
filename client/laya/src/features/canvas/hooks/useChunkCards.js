@@ -10,10 +10,14 @@ export function useChunkCards(visibleChunks, mode = 'home') {
   const [chunks, setChunks] = useState(new Map());
   const [loadingChunks, setLoadingChunks] = useState(new Set());
   const chunkCache = useRef(new Map()); // key -> placedCards
+  const inFlightRef = useRef(new Set()); // key -> boolean
+  const sharedPlaylistsPromiseRef = useRef(null);
 
   useEffect(() => {
-    // Check if mode changed; if so, clear cache
+    // Check if mode changed; if so, clear cache and reset in-flight
     chunkCache.current.clear();
+    inFlightRef.current.clear();
+    sharedPlaylistsPromiseRef.current = null;
     setChunks(new Map());
   }, [mode]);
 
@@ -21,8 +25,9 @@ export function useChunkCards(visibleChunks, mode = 'home') {
     const toFetch = [];
 
     for (const { cx, cy, key } of visibleChunks) {
-      if (!chunkCache.current.has(key)) {
+      if (!chunkCache.current.has(key) && !inFlightRef.current.has(key)) {
         toFetch.push({ cx, cy, key });
+        inFlightRef.current.add(key);
       }
     }
 
@@ -34,7 +39,13 @@ export function useChunkCards(visibleChunks, mode = 'home') {
           nextMap.set(key, chunkCache.current.get(key));
         }
       }
-      setChunks(nextMap);
+      setChunks(prev => {
+        if (nextMap.size !== prev.size) return nextMap;
+        for (const [k, v] of nextMap.entries()) {
+          if (prev.get(k) !== v) return nextMap;
+        }
+        return prev;
+      });
       return;
     }
 
@@ -52,7 +63,13 @@ export function useChunkCards(visibleChunks, mode = 'home') {
         let rawCards = [];
 
         if (mode === 'playlists') {
-          const playlists = await playlistsApi.getPublicPlaylists();
+          if (!sharedPlaylistsPromiseRef.current) {
+            sharedPlaylistsPromiseRef.current = playlistsApi.getPublicPlaylists().catch(err => {
+              sharedPlaylistsPromiseRef.current = null;
+              throw err;
+            });
+          }
+          const playlists = await sharedPlaylistsPromiseRef.current;
           rawCards = (playlists || []).map(p => toCard(p, 'playlist'));
         } else {
           const kindsParam = mode === 'songs' ? 'song' : mode === 'albums' ? 'album' : 'song,album';
@@ -86,6 +103,8 @@ export function useChunkCards(visibleChunks, mode = 'home') {
         console.error(`Failed to load chunk ${key}:`, err);
         chunkCache.current.set(key, []);
         return { key, placed: [] };
+      } finally {
+        inFlightRef.current.delete(key);
       }
     });
 

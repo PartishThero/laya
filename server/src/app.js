@@ -28,7 +28,11 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(morgan('dev'));
+
+// Only log failed requests (>= 400) to keep server console clean, unless DEBUG_HTTP=true
+app.use(morgan('dev', {
+  skip: (req, res) => !process.env.DEBUG_HTTP && res.statusCode < 400
+}));
 
 // Health check
 app.get('/api/health', (req, res) => {
