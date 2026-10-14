@@ -7,7 +7,7 @@ import { usePlayer } from '../context/PlayerContext.jsx';
 import { useQueue } from '../context/QueueContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { CardArt } from '../components/cards/CardArt.jsx';
-import { formatDuration, formatDate } from '../utils/format.js';
+import { formatDuration, formatDate } from '@/lib/time.js';
 import { Play, Plus, ArrowLeft, Loader2 } from 'lucide-react';
 
 export default function Album() {

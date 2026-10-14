@@ -1,6 +1,6 @@
 // context/PlayerContext.jsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { audioEngine } from '../services/audio/audioEngine.js';
+import { audioEngine } from '@/lib/audio/audioEngine.js';
 import { useQueue } from './QueueContext.jsx';
 import { useAuth } from './AuthContext.jsx';
 import { historyApi } from '../services/api/history.api.js';

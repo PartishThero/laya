@@ -2,7 +2,7 @@
 // Random off-screen roaming drop zone engine with findability bearing indicator
 
 import { CHUNK_WIDTH, CHUNK_HEIGHT } from '../canvas/chunks.js';
-import { createPRNG } from '../../utils/seededRandom.js';
+import { createPRNG } from '@/lib/math.js';
 
 export class RoamingZoneEngine {
   constructor(seed = 'laya_roam') {

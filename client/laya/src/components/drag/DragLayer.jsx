@@ -1,7 +1,7 @@
 // components/drag/DragLayer.jsx
 import React, { useEffect } from 'react';
 import { useDrag } from '../../context/DragContext.jsx';
-import { DRAG_STATES } from '../../engines/dnd/dragController.js';
+import { DRAG_STATES } from '@/lib/dnd/dragController.js';
 import { SongCard } from '../cards/SongCard.jsx';
 import { AlbumCard } from '../cards/AlbumCard.jsx';
 import { PlaylistCard } from '../cards/PlaylistCard.jsx';

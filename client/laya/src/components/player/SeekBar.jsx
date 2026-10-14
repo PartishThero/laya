@@ -1,6 +1,6 @@
 // components/player/SeekBar.jsx
 import React from 'react';
-import { formatDuration } from '../../utils/format.js';
+import { formatDuration } from '@/lib/time.js';
 
 export function SeekBar({ currentTime, duration, onSeek }) {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;

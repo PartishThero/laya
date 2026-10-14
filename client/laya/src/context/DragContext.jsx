@@ -1,7 +1,7 @@
 // context/DragContext.jsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { dragController, DRAG_STATES } from '../engines/dnd/dragController.js';
-import { hitTester } from '../engines/dnd/hitTest.js';
+import { dragController, DRAG_STATES } from '@/lib/dnd/dragController.js';
+import { hitTester } from '@/lib/dnd/hitTest.js';
 import { useQueue } from './QueueContext.jsx';
 import { usePlayer } from './PlayerContext.jsx';
 import { useToast } from './ToastContext.jsx';

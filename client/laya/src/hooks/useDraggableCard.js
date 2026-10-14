@@ -1,8 +1,8 @@
 // hooks/useDraggableCard.js
 import { useRef, useCallback } from 'react';
-import { dragController } from '../engines/dnd/dragController.js';
-import { hitTester } from '../engines/dnd/hitTest.js';
-import { calculateEdgeAutoPan } from '../engines/dnd/autoPan.js';
+import { dragController } from '@/lib/dnd/dragController.js';
+import { hitTester } from '@/lib/dnd/hitTest.js';
+import { calculateEdgeAutoPan } from '@/lib/dnd/autoPan.js';
 
 export function useDraggableCard({ card, onClick, tilt = 0, onPanCanvas }) {
   const pointerStartRef = useRef(null);

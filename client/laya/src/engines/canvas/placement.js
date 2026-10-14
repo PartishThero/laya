@@ -1,5 +1,5 @@
 // engines/canvas/placement.js
-import { createPRNG, seededRandomRange } from '../../utils/seededRandom.js';
+import { createPRNG, seededRandomRange } from '@/lib/math.js';
 import { CHUNK_WIDTH, CHUNK_HEIGHT } from './chunks.js';
 import { cardSize } from '../../models/card.model.js';
 

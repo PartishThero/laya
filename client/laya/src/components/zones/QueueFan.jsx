@@ -3,7 +3,7 @@ import React from 'react';
 import { useQueue } from '../../context/QueueContext.jsx';
 import { usePlayer } from '../../context/PlayerContext.jsx';
 import { CardArt } from '../cards/CardArt.jsx';
-import { formatDuration } from '../../utils/format.js';
+import { formatDuration } from '@/lib/time.js';
 
 export function QueueFan({ onClose }) {
   const { userQueue, removeFromQueue, clearUserQueue } = useQueue();

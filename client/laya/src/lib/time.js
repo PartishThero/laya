@@ -1,4 +1,5 @@
-// utils/format.js
+// lib/time.js
+// Canonical time formatting and date helpers
 
 export function formatDuration(seconds) {
   if (!seconds || isNaN(seconds)) return '0:00';
@@ -7,6 +8,8 @@ export function formatDuration(seconds) {
   const s = sec % 60;
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
+
+export const formatTime = formatDuration;
 
 export function formatDate(dateStr) {
   if (!dateStr) return '';

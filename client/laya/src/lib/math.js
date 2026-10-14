@@ -1,5 +1,9 @@
-// utils/seededRandom.js
-// Mulberry32 PRNG for deterministic, stable canvas card placement & angles
+// lib/math.js
+// Mulberry32 PRNG for deterministic, stable canvas card placement & angles + math utilities
+
+export function clamp(val, min, max) {
+  return Math.min(Math.max(val, min), max);
+}
 
 export function createPRNG(seed) {
   let s = 0;

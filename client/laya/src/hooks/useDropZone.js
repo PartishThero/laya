@@ -1,7 +1,7 @@
 // hooks/useDropZone.js
 import { useRef, useEffect, useState } from 'react';
-import { hitTester } from '../engines/dnd/hitTest.js';
-import { dragController, DRAG_STATES } from '../engines/dnd/dragController.js';
+import { hitTester } from '@/lib/dnd/hitTest.js';
+import { dragController, DRAG_STATES } from '@/lib/dnd/dragController.js';
 
 export function useDropZone({ id, type, payload = {} }) {
   const zoneRef = useRef(null);

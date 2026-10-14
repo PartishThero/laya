@@ -8,7 +8,7 @@ import { useQueue } from '../context/QueueContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { CardArt } from '../components/cards/CardArt.jsx';
-import { formatDuration } from '../utils/format.js';
+import { formatDuration } from '@/lib/time.js';
 import { Play, ArrowLeft, Trash2, Edit2, Loader2, ArrowUp, ArrowDown } from 'lucide-react';
 
 export default function Playlist() {
