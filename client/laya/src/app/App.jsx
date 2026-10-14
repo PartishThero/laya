@@ -16,7 +16,7 @@ import Playlist from '@/pages/Playlist.jsx';
 import Albums from '@/pages/Albums.jsx';
 import Album from '@/pages/Album.jsx';
 import Artist from '@/pages/Artist.jsx';
-import Search from '@/pages/Search.jsx';
+import Search from '@/features/search/pages/Search.jsx';
 import Library from '@/pages/Library.jsx';
 import LikedSongs from '@/pages/LikedSongs.jsx';
 import Login from '@/features/auth/pages/Login.jsx';
