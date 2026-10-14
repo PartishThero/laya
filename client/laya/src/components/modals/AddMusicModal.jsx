@@ -1,5 +1,5 @@
 // components/modals/AddMusicModal.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAddMusic } from '@/app/providers/AddMusicContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
 import { catalogueApi } from '@/services/api/catalogue.api.js';
@@ -9,10 +9,8 @@ import {
   Music, 
   Link as LinkIcon, 
   Disc, 
-  Search, 
   Check, 
   Loader2, 
-  Sparkles,
   Image as ImageIcon
 } from 'lucide-react';
 
@@ -20,11 +18,11 @@ export function AddMusicModal() {
   const { isOpen, closeAddMusic } = useAddMusic();
   const { addToast } = useToast();
 
-  const [activeTab, setActiveTab] = useState('upload'); // 'upload' | 'url' | 'spotify'
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload' | 'url'
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  // Form states for manual / file upload
+  // Form states
   const [title, setTitle] = useState('');
   const [artistName, setArtistName] = useState('');
   const [albumTitle, setAlbumTitle] = useState('');
@@ -37,12 +35,6 @@ export function AddMusicModal() {
   const [audioFile, setAudioFile] = useState(null);
   const [coverFile, setCoverFile] = useState(null);
   const [coverPreview, setCoverPreview] = useState('');
-
-  // Spotify search state
-  const [spotifyQuery, setSpotifyQuery] = useState('');
-  const [spotifyResults, setSpotifyResults] = useState([]);
-  const [spotifyLoading, setSpotifyLoading] = useState(false);
-  const [spotifyConfigured, setSpotifyConfigured] = useState(true);
 
   // Reset form when modal opens
   useEffect(() => {
@@ -70,7 +62,6 @@ export function AddMusicModal() {
 
     setAudioFile(file);
     if (!title) {
-      // Auto-extract title from file name
       const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
       setTitle(cleanName);
     }
@@ -101,62 +92,6 @@ export function AddMusicModal() {
       setCoverPreview(event.target?.result);
     };
     reader.readAsDataURL(file);
-  };
-
-  // Debounced Spotify Search
-  useEffect(() => {
-    if (activeTab !== 'spotify' || !spotifyQuery.trim()) {
-      setSpotifyResults([]);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      setSpotifyLoading(true);
-      setError(null);
-      try {
-        const res = await catalogueApi.searchSpotify(spotifyQuery.trim());
-        setSpotifyConfigured(res?.configured ?? true);
-        setSpotifyResults(res?.tracks || []);
-      } catch (err) {
-        console.warn('Spotify search failed:', err);
-      } finally {
-        setSpotifyLoading(false);
-      }
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [spotifyQuery, activeTab]);
-
-  // Import a track from Spotify results
-  const handleImportSpotifyTrack = async (track) => {
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      // Spotify preview audio if available, or fall back to high quality preview stream
-      const finalAudio = track.previewUrl || 'https://cdn.freesound.org/previews/612/612089_11861866-lq.mp3';
-
-      const payload = {
-        title: track.title,
-        artistName: track.artist,
-        albumTitle: track.album,
-        genre: 'Spotify',
-        duration: track.duration || 180,
-        audioUrl: finalAudio,
-        coverUrl: track.coverUrl
-      };
-
-      const newSong = await catalogueApi.createSong(payload);
-
-      // Notify application and canvas
-      window.dispatchEvent(new CustomEvent('laya:song-added', { detail: newSong }));
-      addToast(`✨ Added "${track.title}" by ${track.artist} to catalogue`, 'success');
-      closeAddMusic();
-    } catch (err) {
-      setError(err.message || 'Failed to import Spotify track');
-    } finally {
-      setSubmitting(false);
-    }
   };
 
   // Submit manual or file upload form
@@ -210,7 +145,7 @@ export function AddMusicModal() {
 
       // Notify application and canvas
       window.dispatchEvent(new CustomEvent('laya:song-added', { detail: result }));
-      addToast(`✨ Pressed "${title.trim()}" onto vinyl`, 'success');
+      addToast(`✨ Added "${title.trim()}" to catalogue`, 'success');
       closeAddMusic();
     } catch (err) {
       setError(err.message || 'Failed to add song to catalogue');
@@ -237,7 +172,7 @@ export function AddMusicModal() {
         <div className="flex items-center justify-between border-b border-rule px-6 py-4 bg-paper select-none">
           <div>
             <span className="font-mono text-[10px] tracking-widest uppercase text-accent font-semibold block">
-              Laya Pressing Plant & Archive
+              Laya Analog Archive
             </span>
             <h2 className="font-serif italic text-2xl text-ink leading-tight">
               Add Record to Collection
@@ -265,18 +200,6 @@ export function AddMusicModal() {
           >
             <Upload className="w-3.5 h-3.5" />
             <span>Upload Audio File</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('spotify')}
-            className={`pb-2.5 px-3 border-b-2 font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
-              activeTab === 'spotify'
-                ? 'border-accent text-accent'
-                : 'border-transparent text-ink-soft hover:text-ink'
-            }`}
-          >
-            <Disc className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Spotify Search</span>
           </button>
 
           <button
@@ -352,7 +275,7 @@ export function AddMusicModal() {
                     onChange={handleCoverFileChange}
                     className="text-xs text-ink-soft file:mr-3 file:py-1 file:px-3 file:rounded-xs file:border file:border-rule file:text-xs file:font-mono file:bg-paper file:text-ink hover:file:bg-paper-tint/40 cursor-pointer"
                   />
-                  <span className="text-[10px] text-ink-soft block mt-1">Leaves as vintage vinyl artwork if omitted.</span>
+                  <span className="text-[10px] text-ink-soft block mt-1">Uses vintage vinyl art if left empty.</span>
                 </div>
               </div>
             </div>
@@ -366,7 +289,7 @@ export function AddMusicModal() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Instant Crush"
+                  placeholder="e.g. butterflies."
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full px-3 py-2 bg-paper border border-rule rounded-xs text-xs font-mono text-ink focus:outline-none focus:border-accent"
@@ -380,7 +303,7 @@ export function AddMusicModal() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Daft Punk"
+                  placeholder="e.g. Brent Faiyaz"
                   value={artistName}
                   onChange={(e) => setArtistName(e.target.value)}
                   className="w-full px-3 py-2 bg-paper border border-rule rounded-xs text-xs font-mono text-ink focus:outline-none focus:border-accent"
@@ -393,7 +316,7 @@ export function AddMusicModal() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Random Access Memories"
+                  placeholder="e.g. Sonder Son"
                   value={albumTitle}
                   onChange={(e) => setAlbumTitle(e.target.value)}
                   className="w-full px-3 py-2 bg-paper border border-rule rounded-xs text-xs font-mono text-ink focus:outline-none focus:border-accent"
@@ -406,7 +329,7 @@ export function AddMusicModal() {
                 </label>
                 <input
                   type="text"
-                  placeholder="Vinyl, Electronic, Indie..."
+                  placeholder="Vinyl, R&B, Soul..."
                   value={genre}
                   onChange={(e) => setGenre(e.target.value)}
                   className="w-full px-3 py-2 bg-paper border border-rule rounded-xs text-xs font-mono text-ink focus:outline-none focus:border-accent"
@@ -431,12 +354,12 @@ export function AddMusicModal() {
                 {submitting ? (
                   <>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Pressing Record...</span>
+                    <span>Adding to Collection...</span>
                   </>
                 ) : (
                   <>
                     <Disc className="w-3.5 h-3.5" />
-                    <span>Press & Place on Canvas</span>
+                    <span>Add to Canvas</span>
                   </>
                 )}
               </button>
@@ -444,84 +367,7 @@ export function AddMusicModal() {
           </form>
         )}
 
-        {/* TAB 2: SPOTIFY SEARCH & IMPORT */}
-        {activeTab === 'spotify' && (
-          <div className="p-6 overflow-y-auto space-y-4 font-mono text-xs">
-            <div>
-              <label className="block text-ink-soft mb-1.5 text-[11px] uppercase tracking-wider">
-                Live Spotify Web API Search
-              </label>
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-2.5 text-ink-soft" />
-                <input
-                  type="text"
-                  autoFocus
-                  placeholder="Search any song, artist or album on Spotify..."
-                  value={spotifyQuery}
-                  onChange={(e) => setSpotifyQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-paper border border-rule rounded-xs text-xs font-mono text-ink focus:outline-none focus:border-accent"
-                />
-                {spotifyLoading && (
-                  <Loader2 className="w-4 h-4 absolute right-3 top-2.5 text-accent animate-spin" />
-                )}
-              </div>
-            </div>
-
-            {/* Results container */}
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-              {spotifyResults.length > 0 ? (
-                spotifyResults.map(track => (
-                  <div
-                    key={track.id}
-                    className="flex items-center justify-between p-2.5 rounded-sm border border-rule/70 hover:border-accent bg-paper hover:bg-paper-tint/30 transition-all gap-3"
-                  >
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <img
-                        src={track.coverUrl || 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=100'}
-                        alt={track.title}
-                        className="w-11 h-11 rounded-xs object-cover flex-shrink-0 border border-rule/40"
-                      />
-                      <div className="overflow-hidden">
-                        <span className="font-serif italic text-sm text-ink block truncate">
-                          {track.title}
-                        </span>
-                        <span className="text-[11px] text-ink-soft block truncate">
-                          {track.artist} • {track.album}
-                        </span>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      disabled={submitting}
-                      onClick={() => handleImportSpotifyTrack(track)}
-                      className="px-3 py-1.5 bg-ink text-paper rounded-xs hover:bg-accent transition-colors flex items-center gap-1.5 flex-shrink-0 cursor-pointer disabled:opacity-50 text-[11px]"
-                    >
-                      <Sparkles className="w-3 h-3 text-amber-300" />
-                      <span>Add to Canvas</span>
-                    </button>
-                  </div>
-                ))
-              ) : spotifyQuery.trim() && !spotifyLoading ? (
-                <div className="text-center py-8 text-ink-soft">
-                  <p>No tracks found on Spotify for "{spotifyQuery}".</p>
-                </div>
-              ) : (
-                <div className="text-center py-8 text-ink-soft border border-dashed border-rule rounded-sm p-6">
-                  <Disc className="w-8 h-8 mx-auto mb-2 opacity-40 text-accent animate-pulse" />
-                  <p className="font-serif italic text-sm text-ink mb-1">
-                    Connect directly to Spotify's vast library
-                  </p>
-                  <p className="text-[11px] text-ink-soft max-w-xs mx-auto">
-                    Type a track title or artist name above to pull real metadata, high-res cover art, and add it directly to your table.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: AUDIO URL / DIRECT STREAM */}
+        {/* TAB 2: AUDIO URL / DIRECT STREAM */}
         {activeTab === 'url' && (
           <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 font-mono text-xs">
             <div>
@@ -544,7 +390,7 @@ export function AddMusicModal() {
               </label>
               <input
                 type="url"
-                placeholder="https://images.unsplash.com/... or cover image URL"
+                placeholder="https://images.unsplash.com/... or image link"
                 value={coverUrl}
                 onChange={(e) => setCoverUrl(e.target.value)}
                 className="w-full px-3 py-2 bg-paper border border-rule rounded-xs text-xs font-mono text-ink focus:outline-none focus:border-accent"
@@ -624,7 +470,7 @@ export function AddMusicModal() {
                 {submitting ? (
                   <>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Adding Track...</span>
+                    <span>Adding to Collection...</span>
                   </>
                 ) : (
                   <>

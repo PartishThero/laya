@@ -1,7 +1,6 @@
 import Song from '../models/Song.js';
 import Artist from '../models/Artist.js';
 import Album from '../models/Album.js';
-import { spotifyService } from '../services/spotify.service.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -156,45 +155,6 @@ export const createSong = async (req, res, next) => {
       .populate('album', 'title coverUrl');
 
     res.status(201).json(populatedSong);
-  } catch (err) {
-    next(err);
-  }
-};
-
-// GET /api/songs/spotify/search?q=... - search Spotify track catalogue
-export const searchSpotifyTracks = async (req, res, next) => {
-  try {
-    const { q } = req.query;
-    if (!q || !q.trim()) {
-      return res.json({ configured: spotifyService.isConfigured(), tracks: [] });
-    }
-
-    if (!spotifyService.isConfigured()) {
-      return res.json({
-        configured: false,
-        message: 'Spotify API credentials not yet configured in server/.env',
-        tracks: []
-      });
-    }
-
-    const results = await spotifyService.search(q.trim(), 'track', 10);
-    const rawTracks = results?.tracks?.items || [];
-
-    const mapped = rawTracks.map(t => ({
-      id: t.id,
-      title: t.name,
-      artist: t.artists?.map(a => a.name).join(', ') || 'Unknown Artist',
-      album: t.album?.name || '',
-      coverUrl: t.album?.images?.[0]?.url || '',
-      duration: Math.round((t.duration_ms || 180000) / 1000),
-      previewUrl: t.preview_url,
-      spotifyUrl: t.external_urls?.spotify
-    }));
-
-    res.json({
-      configured: true,
-      tracks: mapped
-    });
   } catch (err) {
     next(err);
   }

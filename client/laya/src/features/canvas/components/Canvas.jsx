@@ -136,7 +136,7 @@ export function Canvas({ mode = 'home' }) {
                 Catalogue is empty.
               </h3>
               <p className="font-mono text-xs text-ink-soft mt-1 mb-5">
-                Upload audio files or search Spotify to add your first track.
+                Upload audio files or add a stream link to add your first track.
               </p>
               <button
                 onClick={openAddMusic}
@@ -184,7 +184,7 @@ export function Canvas({ mode = 'home' }) {
                 The turntable is empty.
               </h3>
               <p className="font-mono text-xs text-ink-soft mt-1.5 mb-5 max-w-xs leading-relaxed">
-                Add songs from your computer files, audio stream links, or Spotify to place your first record onto the table.
+                Add songs from your audio files or direct stream links to place your first record onto the table.
               </p>
               <button
                 onClick={openAddMusic}

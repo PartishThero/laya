@@ -82,7 +82,8 @@ export const recordHistory = async (req, res, next) => {
       return res.status(400).json({ message: 'songId is required' });
     }
 
-    const song = await Song.findById(songId);
+    const cleanId = String(songId).replace(/^(song|album|playlist):/, '');
+    const song = await Song.findById(cleanId);
     if (!song) {
       return res.status(404).json({ message: 'Song not found' });
     }

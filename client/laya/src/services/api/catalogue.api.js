@@ -25,10 +25,6 @@ export const catalogueApi = {
     return await api.post('/songs', payload);
   },
 
-  searchSpotify: async (q) => {
-    return await api.get(`/songs/spotify/search?q=${encodeURIComponent(q)}`);
-  },
-
   deleteSong: async (id) => {
     return await api.delete(`/songs/${id}`);
   },

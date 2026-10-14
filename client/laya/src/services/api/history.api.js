@@ -7,6 +7,11 @@ export const historyApi = {
   },
 
   recordHistory: async (songId) => {
-    return await api.post('/users/me/history', { songId });
+    try {
+      const cleanId = String(songId).replace(/^(song|album|playlist):/, '');
+      return await api.post('/users/me/history', { songId: cleanId });
+    } catch {
+      return null;
+    }
   }
 };
