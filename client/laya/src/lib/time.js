@@ -1,15 +1,15 @@
 // lib/time.js
 // Canonical time formatting and date helpers
 
-export function formatDuration(seconds) {
-  if (!seconds || isNaN(seconds)) return '0:00';
+export function formatTime(seconds, spaced = false) {
+  if (seconds == null || isNaN(seconds) || seconds < 0) return spaced ? '0 : 00' : '0:00';
   const sec = Math.floor(seconds);
   const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
+  const s = String(sec % 60).padStart(2, '0');
+  return spaced ? `${m} : ${s}` : `${m}:${s}`;
 }
 
-export const formatTime = formatDuration;
+export const formatDuration = formatTime;
 
 export function formatDate(dateStr) {
   if (!dateStr) return '';

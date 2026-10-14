@@ -8,7 +8,7 @@ import { useQueue } from '@/features/player/context/QueueContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
 import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { CardArt } from '@/components/cards/CardArt.jsx';
-import { formatDuration } from '@/lib/time.js';
+import { formatTime } from '@/lib/time.js';
 import { Play, ArrowLeft, Trash2, Edit2, Loader2, ArrowUp, ArrowDown } from 'lucide-react';
 
 export default function Playlist() {
@@ -261,7 +261,7 @@ export default function Playlist() {
                 <div className="flex items-center gap-3 pl-4">
                   {track.meta?.duration > 0 && (
                     <span className="font-mono text-xs text-ink-faint">
-                      {formatDuration(track.meta.duration)}
+                      {formatTime(track.meta.duration)}
                     </span>
                   )}
 

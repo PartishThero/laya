@@ -1,6 +1,6 @@
 // components/player/SeekBar.jsx
 import React from 'react';
-import { formatDuration } from '@/lib/time.js';
+import { formatTime } from '@/lib/time.js';
 
 export function SeekBar({ currentTime, duration, onSeek }) {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -13,7 +13,7 @@ export function SeekBar({ currentTime, duration, onSeek }) {
   return (
     <div className="flex items-center gap-2 w-full select-none">
       <span className="text-[10px] font-mono text-ink-soft w-8 text-right tabular-nums">
-        {formatDuration(currentTime)}
+        {formatTime(currentTime)}
       </span>
 
       <div className="relative flex-1 flex items-center group h-4 cursor-pointer">
@@ -38,7 +38,7 @@ export function SeekBar({ currentTime, duration, onSeek }) {
       </div>
 
       <span className="text-[10px] font-mono text-ink-faint w-8 tabular-nums">
-        {formatDuration(duration)}
+        {formatTime(duration)}
       </span>
     </div>
   );

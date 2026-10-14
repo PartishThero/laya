@@ -9,6 +9,7 @@ import {
   useReducedMotion,
 } from 'motion/react'; // `npm i motion`  (same API as framer-motion, which also works)
 import { CardArt } from './CardArt.jsx';
+import { formatTime } from '@/lib/time.js';
 
 const EASE = [0.65, 0, 0.35, 1];
 const OPEN_S = 1.1; // cover slides up and morphs into a circle
@@ -170,8 +171,6 @@ export function VinylCard({
 
   const rawElapsed = currentTime ?? tick;
   const elapsed = Math.floor(duration ? Math.min(rawElapsed, duration) : rawElapsed);
-  const pad = (n) => String(n).padStart(2, '0');
-  const fmt = (s) => `${Math.floor(s / 60)}:${pad(s % 60)}`;
   const progress = duration ? (elapsed / duration) * 100 : 0;
 
   return (
@@ -233,9 +232,9 @@ export function VinylCard({
         ) : null}
 
         <p className="absolute inset-x-0 top-[84.2%] -translate-y-1/2 text-center text-[4.9cqw] font-semibold leading-none tracking-[-0.03em] tabular-nums text-neutral-950">
-          {Math.floor(elapsed / 60)} : {pad(elapsed % 60)}
+          {formatTime(elapsed, true)}
           {duration ? (
-            <span className="font-normal text-neutral-400"> / {fmt(duration)}</span>
+            <span className="font-normal text-neutral-400"> / {formatTime(duration)}</span>
           ) : null}
         </p>
       </motion.div>

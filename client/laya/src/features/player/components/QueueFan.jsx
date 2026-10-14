@@ -3,7 +3,7 @@ import React from 'react';
 import { useQueue } from '@/features/player/context/QueueContext.jsx';
 import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { CardArt } from '@/components/cards/CardArt.jsx';
-import { formatDuration } from '@/lib/time.js';
+import { formatTime } from '@/lib/time.js';
 
 export function QueueFan({ onClose }) {
   const { userQueue, removeFromQueue, clearUserQueue } = useQueue();
@@ -75,7 +75,7 @@ export function QueueFan({ onClose }) {
                   <div className="flex items-center gap-2 pl-2">
                     {card.meta?.duration > 0 && (
                       <span className="text-[10px] font-mono text-ink-faint">
-                        {formatDuration(card.meta.duration)}
+                        {formatTime(card.meta.duration)}
                       </span>
                     )}
                     <button

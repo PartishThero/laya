@@ -7,7 +7,7 @@ import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { useQueue } from '@/features/player/context/QueueContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
 import { CardArt } from '@/components/cards/CardArt.jsx';
-import { formatDuration, formatDate } from '@/lib/time.js';
+import { formatTime, formatDate } from '@/lib/time.js';
 import { Play, Plus, ArrowLeft, Loader2 } from 'lucide-react';
 
 export default function Album() {
@@ -142,7 +142,7 @@ export default function Album() {
 
               <div className="flex items-center gap-4 pl-4">
                 <span className="font-mono text-xs text-ink-faint">
-                  {formatDuration(track.meta?.duration)}
+                  {formatTime(track.meta?.duration)}
                 </span>
                 <button
                   onClick={() => {
