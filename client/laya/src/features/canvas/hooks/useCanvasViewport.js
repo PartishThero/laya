@@ -1,7 +1,7 @@
 // hooks/useCanvasViewport.js
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { zoomAtPoint, MIN_ZOOM, MAX_ZOOM } from '../engines/canvas/viewport.js';
-import { PanMomentumTracker } from '../engines/canvas/momentum.js';
+import { zoomAtPoint, MIN_ZOOM, MAX_ZOOM } from '@/features/canvas/engines/viewport.js';
+import { PanMomentumTracker } from '@/features/canvas/engines/momentum.js';
 
 export function useCanvasViewport(containerRef) {
   const [viewport, setViewport] = useState({ x: 0, y: 0, scale: 1.0 });

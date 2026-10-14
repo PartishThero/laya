@@ -1,19 +1,19 @@
 // components/canvas/Canvas.jsx
 import React, { useRef, useMemo, useCallback } from 'react';
-import { useCanvasViewport } from '../../hooks/useCanvasViewport.js';
-import { useChunkCards } from '../../hooks/useChunkCards.js';
-import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts.js';
+import { useCanvasViewport } from '@/features/canvas/hooks/useCanvasViewport.js';
+import { useChunkCards } from '@/features/canvas/hooks/useChunkCards.js';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts.js';
 import { usePrefs } from '@/app/providers/PrefsContext.jsx';
 import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
-import { getVisibleWorldBounds } from '../../engines/canvas/viewport.js';
-import { getVisibleChunkCoords } from '../../engines/canvas/chunks.js';
-import { CanvasBackground } from './CanvasBackground.jsx';
-import { Chunk } from './Chunk.jsx';
-import { RoamingZone } from '../zones/RoamingZone.jsx';
-import { PositionNote } from './PositionNote.jsx';
-import { ReturnHome } from './ReturnHome.jsx';
-import { Card } from '../cards/Card.jsx';
-import { CANVAS_MODES } from '../../engines/canvas/canvasModes.js';
+import { getVisibleWorldBounds } from '@/features/canvas/engines/viewport.js';
+import { getVisibleChunkCoords } from '@/features/canvas/engines/chunks.js';
+import { CanvasBackground } from '@/features/canvas/components/CanvasBackground.jsx';
+import { Chunk } from '@/features/canvas/components/Chunk.jsx';
+import { RoamingZone } from '@/components/zones/RoamingZone.jsx';
+import { PositionNote } from '@/features/canvas/components/PositionNote.jsx';
+import { ReturnHome } from '@/features/canvas/components/ReturnHome.jsx';
+import { Card } from '@/components/cards/Card.jsx';
+import { CANVAS_MODES } from '@/features/canvas/engines/canvasModes.js';
 
 export function Canvas({ mode = 'home' }) {
   const containerRef = useRef(null);

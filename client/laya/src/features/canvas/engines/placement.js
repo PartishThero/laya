@@ -1,7 +1,7 @@
 // engines/canvas/placement.js
 import { createPRNG, seededRandomRange } from '@/lib/math.js';
-import { CHUNK_WIDTH, CHUNK_HEIGHT } from './chunks.js';
-import { cardSize } from '../../models/card.model.js';
+import { CHUNK_WIDTH, CHUNK_HEIGHT } from '@/features/canvas/engines/chunks.js';
+import { cardSize } from '@/models/card.model.js';
 
 export function placeCardsInChunk(cards, cx, cy, sessionSeed = 'laya') {
   if (!cards || cards.length === 0) return [];

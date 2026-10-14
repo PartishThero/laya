@@ -1,7 +1,7 @@
 // engines/roaming/roamingZone.js
 // Random off-screen roaming drop zone engine with findability bearing indicator
 
-import { CHUNK_WIDTH, CHUNK_HEIGHT } from '../canvas/chunks.js';
+import { CHUNK_WIDTH, CHUNK_HEIGHT } from '@/features/canvas/engines/chunks.js';
 import { createPRNG } from '@/lib/math.js';
 
 export class RoamingZoneEngine {

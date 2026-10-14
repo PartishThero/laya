@@ -1,8 +1,8 @@
 // components/canvas/Chunk.jsx
 import React from 'react';
-import { Card } from '../cards/Card.jsx';
-import { CardSkeleton } from '../cards/CardSkeleton.jsx';
-import { CHUNK_WIDTH, CHUNK_HEIGHT } from '../../engines/canvas/chunks.js';
+import { Card } from '@/components/cards/Card.jsx';
+import { CardSkeleton } from '@/components/cards/CardSkeleton.jsx';
+import { CHUNK_WIDTH, CHUNK_HEIGHT } from '@/features/canvas/engines/chunks.js';
 
 export function Chunk({ cx, cy, placedCards, isLoading, onCardClick, onPanCanvas }) {
   const worldX = cx * CHUNK_WIDTH;

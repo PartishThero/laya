@@ -1,10 +1,10 @@
 // hooks/useChunkCards.js
 import { useState, useEffect, useRef } from 'react';
-import { chunkCoordToSpiralIndex } from '../engines/canvas/spiral.js';
-import { placeCardsInChunk } from '../engines/canvas/placement.js';
-import { catalogueApi } from '../services/api/catalogue.api.js';
-import { playlistsApi } from '../services/api/playlists.api.js';
-import { toCard } from '../models/card.model.js';
+import { chunkCoordToSpiralIndex } from '@/features/canvas/engines/spiral.js';
+import { placeCardsInChunk } from '@/features/canvas/engines/placement.js';
+import { catalogueApi } from '@/services/api/catalogue.api.js';
+import { playlistsApi } from '@/services/api/playlists.api.js';
+import { toCard } from '@/models/card.model.js';
 
 export function useChunkCards(visibleChunks, mode = 'home') {
   const [chunks, setChunks] = useState(new Map());
