@@ -8,11 +8,17 @@ export function placeCardsInChunk(cards, cx, cy, sessionSeed = 'laya') {
 
   const rng = createPRNG(`${sessionSeed}_chunk_${cx}_${cy}`);
   
-  // Arrange in a soft organic 3x3 or 4x3 grid with jitter
-  const cols = 3;
-  const rows = Math.ceil(cards.length / cols);
-  const cellW = CHUNK_WIDTH / cols;
-  const cellH = CHUNK_HEIGHT / Math.max(rows, 2);
+  // Organic, free-plane spatial scattering across the continuous canvas
+  const count = cards.length;
+  const paddingX = 70;
+  const paddingY = 70;
+  const usableW = CHUNK_WIDTH - paddingX * 2;
+  const usableH = CHUNK_HEIGHT - paddingY * 2;
+
+  const cols = Math.min(count, 3);
+  const rows = Math.ceil(count / cols);
+  const stepX = usableW / cols;
+  const stepY = usableH / Math.max(rows, 1);
 
   return cards.map((card, idx) => {
     const col = idx % cols;
@@ -20,21 +26,21 @@ export function placeCardsInChunk(cards, cx, cy, sessionSeed = 'laya') {
 
     const size = cardSize(card.kind);
 
-    // Jitter within cell boundaries
-    const maxJitterX = (cellW - size.width) * 0.35;
-    const maxJitterY = (cellH - size.height) * 0.35;
+    // Organic displacement across the plane
+    const jitterFactorX = (stepX - size.width) * 0.45;
+    const jitterFactorY = (stepY - size.height) * 0.45;
 
-    const jitterX = seededRandomRange(rng, -maxJitterX, maxJitterX);
-    const jitterY = seededRandomRange(rng, -maxJitterY, maxJitterY);
+    const jitterX = seededRandomRange(rng, -jitterFactorX, jitterFactorX);
+    const jitterY = seededRandomRange(rng, -jitterFactorY, jitterFactorY);
 
-    // Slight organic tilt between -4.5 and +4.5 degrees
-    const tilt = seededRandomRange(rng, -4.5, 4.5);
+    // Physical vinyl rotation between -6 and +6 degrees
+    const tilt = seededRandomRange(rng, -6, 6);
 
-    const baseX = col * cellW + (cellW - size.width) / 2;
-    const baseY = row * cellH + (cellH - size.height) / 2;
+    const anchorX = paddingX + col * stepX + (stepX - size.width) / 2;
+    const anchorY = paddingY + row * stepY + (stepY - size.height) / 2;
 
-    const localX = Math.round(baseX + jitterX);
-    const localY = Math.round(baseY + jitterY);
+    const localX = Math.round(anchorX + jitterX);
+    const localY = Math.round(anchorY + jitterY);
 
     return {
       card,

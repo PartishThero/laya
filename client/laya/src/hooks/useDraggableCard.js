@@ -49,7 +49,7 @@ export function useDraggableCard({ card, onClick, tilt = 0, onPanCanvas }) {
     if (e.button !== 0 && e.pointerType === 'mouse') return;
 
     pointerStartRef.current = { x: e.clientX, y: e.clientY };
-    isDraggingRef.current = false;
+    isDraggingCardRef.current = false;
 
     if (e.currentTarget) {
       const rect = e.currentTarget.getBoundingClientRect();

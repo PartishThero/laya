@@ -17,8 +17,7 @@ export function Chunk({ cx, cy, placedCards, isLoading, onCardClick, onPanCanvas
         height: `${CHUNK_HEIGHT}px`
       }}
     >
-      {/* Light chunk border grid reference in fine ink */}
-      <div className="absolute inset-0 border border-rule/10 pointer-events-none" />
+
 
       {isLoading && (!placedCards || placedCards.length === 0) ? (
         <div className="relative w-full h-full p-10 flex flex-wrap gap-8 items-center justify-center">

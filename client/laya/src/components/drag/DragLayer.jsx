@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useDrag } from '@/app/providers/DragContext.jsx';
 import { dragController, DRAG_STATES } from '@/lib/dnd/dragController.js';
+import { hitTester } from '@/lib/dnd/hitTest.js';
 import { SongCard } from '@/components/cards/SongCard.jsx';
 import { AlbumCard } from '@/components/cards/AlbumCard.jsx';
 import { PlaylistCard } from '@/components/cards/PlaylistCard.jsx';
@@ -13,6 +14,11 @@ export function DragLayer() {
   useEffect(() => {
     if (status === DRAG_STATES.IDLE) return;
 
+    const handlePointerMoveGlobal = (e) => {
+      const hitResult = hitTester.testPoint(e.clientX, e.clientY);
+      dragController.updatePosition(e.clientX, e.clientY, hitResult);
+    };
+
     const handlePointerUpGlobal = () => {
       handleDrop();
     };
@@ -23,11 +29,13 @@ export function DragLayer() {
       }
     };
 
+    window.addEventListener('pointermove', handlePointerMoveGlobal);
     window.addEventListener('pointerup', handlePointerUpGlobal);
     window.addEventListener('pointercancel', handlePointerUpGlobal);
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      window.removeEventListener('pointermove', handlePointerMoveGlobal);
       window.removeEventListener('pointerup', handlePointerUpGlobal);
       window.removeEventListener('pointercancel', handlePointerUpGlobal);
       window.removeEventListener('keydown', handleKeyDown);
