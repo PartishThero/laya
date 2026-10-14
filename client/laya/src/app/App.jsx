@@ -4,8 +4,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext.jsx';
 import { PrefsProvider } from '@/app/providers/PrefsContext.jsx';
 import { ToastProvider } from '@/app/providers/ToastContext.jsx';
-import { QueueProvider } from '@/context/QueueContext.jsx';
-import { PlayerProvider } from '@/context/PlayerContext.jsx';
+import { QueueProvider } from '@/features/player/context/QueueContext.jsx';
+import { PlayerProvider } from '@/features/player/context/PlayerContext.jsx';
 import { DragProvider } from '@/app/providers/DragContext.jsx';
 import { AppShell } from '@/app/AppShell.jsx';
 

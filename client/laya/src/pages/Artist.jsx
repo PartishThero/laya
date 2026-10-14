@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { catalogueApi } from '../services/api/catalogue.api.js';
 import { toCard } from '../models/card.model.js';
 import { Card } from '../components/cards/Card.jsx';
-import { usePlayer } from '../context/PlayerContext.jsx';
+import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 
 export default function Artist() {

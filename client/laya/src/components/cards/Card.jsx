@@ -5,9 +5,9 @@ import { AlbumCard } from './AlbumCard.jsx';
 import { PlaylistCard } from './PlaylistCard.jsx';
 import { CardGhost } from './CardGhost.jsx';
 import { useDraggableCard } from '../../hooks/useDraggableCard.js';
-import { usePlayer } from '../../context/PlayerContext.jsx';
+import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { useDrag } from '@/app/providers/DragContext.jsx';
-import { useQueue } from '../../context/QueueContext.jsx';
+import { useQueue } from '@/features/player/context/QueueContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
 import { cardLabel } from '../../models/card.model.js';
 

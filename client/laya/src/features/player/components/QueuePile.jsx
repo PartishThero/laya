@@ -1,8 +1,8 @@
 // components/zones/QueuePile.jsx
 import React, { useState } from 'react';
-import { useQueue } from '../../context/QueueContext.jsx';
-import { CardArt } from '../cards/CardArt.jsx';
-import { QueueFan } from './QueueFan.jsx';
+import { useQueue } from '@/features/player/context/QueueContext.jsx';
+import { CardArt } from '@/components/cards/CardArt.jsx';
+import { QueueFan } from '@/features/player/components/QueueFan.jsx';
 
 export function QueuePile({ isNear = false }) {
   const { userQueue } = useQueue();

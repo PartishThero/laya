@@ -4,7 +4,7 @@ import { useCanvasViewport } from '../../hooks/useCanvasViewport.js';
 import { useChunkCards } from '../../hooks/useChunkCards.js';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts.js';
 import { usePrefs } from '@/app/providers/PrefsContext.jsx';
-import { usePlayer } from '../../context/PlayerContext.jsx';
+import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { getVisibleWorldBounds } from '../../engines/canvas/viewport.js';
 import { getVisibleChunkCoords } from '../../engines/canvas/chunks.js';
 import { CanvasBackground } from './CanvasBackground.jsx';

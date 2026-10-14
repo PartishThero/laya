@@ -1,8 +1,8 @@
 // components/zones/QueueFan.jsx
 import React from 'react';
-import { useQueue } from '../../context/QueueContext.jsx';
-import { usePlayer } from '../../context/PlayerContext.jsx';
-import { CardArt } from '../cards/CardArt.jsx';
+import { useQueue } from '@/features/player/context/QueueContext.jsx';
+import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
+import { CardArt } from '@/components/cards/CardArt.jsx';
 import { formatDuration } from '@/lib/time.js';
 
 export function QueueFan({ onClose }) {

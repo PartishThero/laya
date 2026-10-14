@@ -8,7 +8,7 @@ import {
   reorderUserQueue,
   getNextTrack,
   getPrevTrack
-} from '../models/queue.model.js';
+} from '@/models/queue.model.js';
 
 const QueueContext = createContext(null);
 

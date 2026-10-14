@@ -1,11 +1,11 @@
 // components/zones/NowPlayingZone.jsx
 import React, { useState } from 'react';
-import { usePlayer } from '../../context/PlayerContext.jsx';
-import { useDropZone } from '../../hooks/useDropZone.js';
-import { CardArt } from '../cards/CardArt.jsx';
-import { QueuePile } from './QueuePile.jsx';
-import { SeekBar } from '../player/SeekBar.jsx';
-import { VolumeControl } from '../player/VolumeControl.jsx';
+import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
+import { useDropZone } from '@/hooks/useDropZone.js';
+import { CardArt } from '@/components/cards/CardArt.jsx';
+import { QueuePile } from '@/features/player/components/QueuePile.jsx';
+import { SeekBar } from '@/features/player/components/SeekBar.jsx';
+import { VolumeControl } from '@/features/player/components/VolumeControl.jsx';
 import { Play, Pause, SkipForward, SkipBack, ChevronDown, ChevronUp } from 'lucide-react';
 
 export function NowPlayingZone() {

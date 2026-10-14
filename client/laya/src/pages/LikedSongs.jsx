@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { likesApi } from '../services/api/likes.api.js';
 import { toCard } from '../models/card.model.js';
 import { Card } from '../components/cards/Card.jsx';
-import { usePlayer } from '../context/PlayerContext.jsx';
+import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { Heart, ArrowLeft, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

@@ -1,6 +1,6 @@
 // hooks/useKeyboardShortcuts.js
 import { useEffect } from 'react';
-import { usePlayer } from '../context/PlayerContext.jsx';
+import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { usePrefs } from '@/app/providers/PrefsContext.jsx';
 
 export function useKeyboardShortcuts({ onReturnHome, onPan, onZoom }) {

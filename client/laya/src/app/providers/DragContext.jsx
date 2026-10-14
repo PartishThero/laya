@@ -2,8 +2,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { dragController, DRAG_STATES } from '@/lib/dnd/dragController.js';
 import { hitTester } from '@/lib/dnd/hitTest.js';
-import { useQueue } from '@/context/QueueContext.jsx';
-import { usePlayer } from '@/context/PlayerContext.jsx';
+import { useQueue } from '@/features/player/context/QueueContext.jsx';
+import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
 import { useAuth } from '@/context/AuthContext.jsx';
 import { playlistsApi } from '@/services/api/playlists.api.js';
