@@ -1,10 +1,10 @@
 // components/layout/AppShell.jsx
 import React from 'react';
-import { NavRail } from '../navigation/NavRail.jsx';
-import { NowPlayingZone } from '../zones/NowPlayingZone.jsx';
-import { PlaylistDock } from '../zones/PlaylistDock.jsx';
-import { DragLayer } from '../drag/DragLayer.jsx';
-import { FirstVisitHint } from '../feedback/FirstVisitHint.jsx';
+import { NavRail } from '@/components/ui/NavRail.jsx';
+import { NowPlayingZone } from '@/components/zones/NowPlayingZone.jsx';
+import { PlaylistDock } from '@/components/zones/PlaylistDock.jsx';
+import { DragLayer } from '@/components/drag/DragLayer.jsx';
+import { FirstVisitHint } from '@/components/ui/FirstVisitHint.jsx';
 
 export function AppShell({ children }) {
   return (

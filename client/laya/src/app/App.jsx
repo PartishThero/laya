@@ -1,26 +1,26 @@
 // App.jsx
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext.jsx';
-import { PrefsProvider } from './context/PrefsContext.jsx';
-import { ToastProvider } from './context/ToastContext.jsx';
-import { QueueProvider } from './context/QueueContext.jsx';
-import { PlayerProvider } from './context/PlayerContext.jsx';
-import { DragProvider } from './context/DragContext.jsx';
-import { AppShell } from './components/layout/AppShell.jsx';
+import { AuthProvider } from '@/context/AuthContext.jsx';
+import { PrefsProvider } from '@/app/providers/PrefsContext.jsx';
+import { ToastProvider } from '@/app/providers/ToastContext.jsx';
+import { QueueProvider } from '@/context/QueueContext.jsx';
+import { PlayerProvider } from '@/context/PlayerContext.jsx';
+import { DragProvider } from '@/app/providers/DragContext.jsx';
+import { AppShell } from '@/app/AppShell.jsx';
 
-import Home from './pages/Home.jsx';
-import Songs from './pages/Songs.jsx';
-import Playlists from './pages/Playlists.jsx';
-import Playlist from './pages/Playlist.jsx';
-import Albums from './pages/Albums.jsx';
-import Album from './pages/Album.jsx';
-import Artist from './pages/Artist.jsx';
-import Search from './pages/Search.jsx';
-import Library from './pages/Library.jsx';
-import LikedSongs from './pages/LikedSongs.jsx';
-import Login from './pages/Login.jsx';
-import Signup from './pages/Signup.jsx';
+import Home from '@/pages/Home.jsx';
+import Songs from '@/pages/Songs.jsx';
+import Playlists from '@/pages/Playlists.jsx';
+import Playlist from '@/pages/Playlist.jsx';
+import Albums from '@/pages/Albums.jsx';
+import Album from '@/pages/Album.jsx';
+import Artist from '@/pages/Artist.jsx';
+import Search from '@/pages/Search.jsx';
+import Library from '@/pages/Library.jsx';
+import LikedSongs from '@/pages/LikedSongs.jsx';
+import Login from '@/pages/Login.jsx';
+import Signup from '@/pages/Signup.jsx';
 
 export default function App() {
   return (

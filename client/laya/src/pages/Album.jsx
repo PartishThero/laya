@@ -5,7 +5,7 @@ import { catalogueApi } from '../services/api/catalogue.api.js';
 import { toCard } from '../models/card.model.js';
 import { usePlayer } from '../context/PlayerContext.jsx';
 import { useQueue } from '../context/QueueContext.jsx';
-import { useToast } from '../context/ToastContext.jsx';
+import { useToast } from '@/app/providers/ToastContext.jsx';
 import { CardArt } from '../components/cards/CardArt.jsx';
 import { formatDuration, formatDate } from '@/lib/time.js';
 import { Play, Plus, ArrowLeft, Loader2 } from 'lucide-react';

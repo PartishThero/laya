@@ -1,6 +1,6 @@
 // components/feedback/FirstVisitHint.jsx
 import React from 'react';
-import { usePrefs } from '../../context/PrefsContext.jsx';
+import { usePrefs } from '@/app/providers/PrefsContext.jsx';
 import { Hand, Music, ArrowDown } from 'lucide-react';
 
 export function FirstVisitHint() {

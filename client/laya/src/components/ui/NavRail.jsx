@@ -1,9 +1,9 @@
 // components/navigation/NavRail.jsx
 import React from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Wordmark } from './Wordmark.jsx';
-import { useAuth } from '../../context/AuthContext.jsx';
-import { usePrefs } from '../../context/PrefsContext.jsx';
+import { Wordmark } from '@/components/ui/Wordmark.jsx';
+import { useAuth } from '@/context/AuthContext.jsx';
+import { usePrefs } from '@/app/providers/PrefsContext.jsx';
 import { Sun, Moon, Search, List, Grid, LogOut, User } from 'lucide-react';
 
 export function NavRail() {

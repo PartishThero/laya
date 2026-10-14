@@ -4,8 +4,8 @@ import { roamingZoneEngine } from '../../engines/roaming/roamingZone.js';
 import { useDropZone } from '../../hooks/useDropZone.js';
 import { playlistsApi } from '../../services/api/playlists.api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { useToast } from '../../context/ToastContext.jsx';
-import { ZoneStamp } from './ZoneStamp.jsx';
+import { useToast } from '@/app/providers/ToastContext.jsx';
+import { ZoneStamp } from '@/components/ui/ZoneStamp.jsx';
 import { Compass, Sparkles } from 'lucide-react';
 
 export function RoamingZone({ viewport }) {

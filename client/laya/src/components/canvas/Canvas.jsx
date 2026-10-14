@@ -3,7 +3,7 @@ import React, { useRef, useMemo, useCallback } from 'react';
 import { useCanvasViewport } from '../../hooks/useCanvasViewport.js';
 import { useChunkCards } from '../../hooks/useChunkCards.js';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts.js';
-import { usePrefs } from '../../context/PrefsContext.jsx';
+import { usePrefs } from '@/app/providers/PrefsContext.jsx';
 import { usePlayer } from '../../context/PlayerContext.jsx';
 import { getVisibleWorldBounds } from '../../engines/canvas/viewport.js';
 import { getVisibleChunkCoords } from '../../engines/canvas/chunks.js';

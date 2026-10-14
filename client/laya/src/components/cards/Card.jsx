@@ -6,9 +6,9 @@ import { PlaylistCard } from './PlaylistCard.jsx';
 import { CardGhost } from './CardGhost.jsx';
 import { useDraggableCard } from '../../hooks/useDraggableCard.js';
 import { usePlayer } from '../../context/PlayerContext.jsx';
-import { useDrag } from '../../context/DragContext.jsx';
+import { useDrag } from '@/app/providers/DragContext.jsx';
 import { useQueue } from '../../context/QueueContext.jsx';
-import { useToast } from '../../context/ToastContext.jsx';
+import { useToast } from '@/app/providers/ToastContext.jsx';
 import { cardLabel } from '../../models/card.model.js';
 
 export function Card({ card, tilt = 0, onClick, onPanCanvas }) {
