@@ -1,12 +1,12 @@
 // pages/Album.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { catalogueApi } from '../services/api/catalogue.api.js';
-import { toCard } from '../models/card.model.js';
+import { catalogueApi } from '@/services/api/catalogue.api.js';
+import { toCard } from '@/models/card.model.js';
 import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { useQueue } from '@/features/player/context/QueueContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
-import { CardArt } from '../components/cards/CardArt.jsx';
+import { CardArt } from '@/components/cards/CardArt.jsx';
 import { formatDuration, formatDate } from '@/lib/time.js';
 import { Play, Plus, ArrowLeft, Loader2 } from 'lucide-react';
 

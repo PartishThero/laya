@@ -9,16 +9,16 @@ import { PlayerProvider } from '@/features/player/context/PlayerContext.jsx';
 import { DragProvider } from '@/app/providers/DragContext.jsx';
 import { AppShell } from '@/app/AppShell.jsx';
 
-import Home from '@/pages/Home.jsx';
-import Songs from '@/pages/Songs.jsx';
-import Playlists from '@/pages/Playlists.jsx';
-import Playlist from '@/pages/Playlist.jsx';
-import Albums from '@/pages/Albums.jsx';
-import Album from '@/pages/Album.jsx';
-import Artist from '@/pages/Artist.jsx';
+import Home from '@/features/library/pages/Home.jsx';
+import Songs from '@/features/library/pages/Songs.jsx';
+import Playlists from '@/features/library/pages/Playlists.jsx';
+import Playlist from '@/features/library/pages/Playlist.jsx';
+import Albums from '@/features/library/pages/Albums.jsx';
+import Album from '@/features/library/pages/Album.jsx';
+import Artist from '@/features/library/pages/Artist.jsx';
 import Search from '@/features/search/pages/Search.jsx';
-import Library from '@/pages/Library.jsx';
-import LikedSongs from '@/pages/LikedSongs.jsx';
+import Library from '@/features/library/pages/Library.jsx';
+import LikedSongs from '@/features/library/pages/LikedSongs.jsx';
 import Login from '@/features/auth/pages/Login.jsx';
 import Signup from '@/features/auth/pages/Signup.jsx';
 

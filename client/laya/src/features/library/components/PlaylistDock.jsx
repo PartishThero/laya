@@ -2,12 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { usePrefs } from '@/app/providers/PrefsContext.jsx';
 import { useAuth } from '@/features/auth/context/AuthContext.jsx';
-import { useDropZone } from '../../hooks/useDropZone.js';
-import { playlistsApi } from '../../services/api/playlists.api.js';
-import { CardArt } from '../cards/CardArt.jsx';
+import { useDropZone } from '@/hooks/useDropZone.js';
+import { playlistsApi } from '@/services/api/playlists.api.js';
+import { CardArt } from '@/components/cards/CardArt.jsx';
 import { ZoneStamp } from '@/components/ui/ZoneStamp.jsx';
 import { Plus, Lock, FolderPlus } from 'lucide-react';
-import { toCard } from '../../models/card.model.js';
+import { toCard } from '@/models/card.model.js';
 
 function DockPlaylistSlot({ playlist, onRefresh }) {
   const [stamp, setStamp] = useState('idle');

@@ -1,13 +1,13 @@
 // pages/Playlist.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { playlistsApi } from '../services/api/playlists.api.js';
-import { toCard } from '../models/card.model.js';
+import { playlistsApi } from '@/services/api/playlists.api.js';
+import { toCard } from '@/models/card.model.js';
 import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { useQueue } from '@/features/player/context/QueueContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
 import { useAuth } from '@/features/auth/context/AuthContext.jsx';
-import { CardArt } from '../components/cards/CardArt.jsx';
+import { CardArt } from '@/components/cards/CardArt.jsx';
 import { formatDuration } from '@/lib/time.js';
 import { Play, ArrowLeft, Trash2, Edit2, Loader2, ArrowUp, ArrowDown } from 'lucide-react';
 

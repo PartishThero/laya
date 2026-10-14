@@ -1,11 +1,11 @@
 // pages/Library.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/features/auth/context/AuthContext.jsx';
-import { playlistsApi } from '../services/api/playlists.api.js';
-import { likesApi } from '../services/api/likes.api.js';
-import { historyApi } from '../services/api/history.api.js';
-import { toCard } from '../models/card.model.js';
-import { Card } from '../components/cards/Card.jsx';
+import { playlistsApi } from '@/services/api/playlists.api.js';
+import { likesApi } from '@/services/api/likes.api.js';
+import { historyApi } from '@/services/api/history.api.js';
+import { toCard } from '@/models/card.model.js';
+import { Card } from '@/components/cards/Card.jsx';
 import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { Link } from 'react-router-dom';
 import { BookMarked, Heart, History, Plus } from 'lucide-react';

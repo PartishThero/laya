@@ -1,8 +1,8 @@
 // components/zones/RoamingZone.jsx
 import React, { useState, useEffect } from 'react';
-import { roamingZoneEngine } from '../../engines/roaming/roamingZone.js';
-import { useDropZone } from '../../hooks/useDropZone.js';
-import { playlistsApi } from '../../services/api/playlists.api.js';
+import { roamingZoneEngine } from '@/features/library/engines/roamingZoneEngine.js';
+import { useDropZone } from '@/hooks/useDropZone.js';
+import { playlistsApi } from '@/services/api/playlists.api.js';
 import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
 import { ZoneStamp } from '@/components/ui/ZoneStamp.jsx';

@@ -9,7 +9,7 @@ import { getVisibleWorldBounds } from '@/features/canvas/engines/viewport.js';
 import { getVisibleChunkCoords } from '@/features/canvas/engines/chunks.js';
 import { CanvasBackground } from '@/features/canvas/components/CanvasBackground.jsx';
 import { Chunk } from '@/features/canvas/components/Chunk.jsx';
-import { RoamingZone } from '@/components/zones/RoamingZone.jsx';
+import { RoamingZone } from '@/features/library/components/RoamingZone.jsx';
 import { PositionNote } from '@/features/canvas/components/PositionNote.jsx';
 import { ReturnHome } from '@/features/canvas/components/ReturnHome.jsx';
 import { Card } from '@/components/cards/Card.jsx';
