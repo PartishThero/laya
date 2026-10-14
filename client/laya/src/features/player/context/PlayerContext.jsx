@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { audioEngine } from '@/lib/audio/audioEngine.js';
 import { useQueue } from '@/features/player/context/QueueContext.jsx';
-import { useAuth } from '@/context/AuthContext.jsx';
+import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { historyApi } from '@/services/api/history.api.js';
 import { catalogueApi } from '@/services/api/catalogue.api.js';
 import { playlistsApi } from '@/services/api/playlists.api.js';

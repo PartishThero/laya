@@ -1,6 +1,6 @@
 // pages/Signup.jsx
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 

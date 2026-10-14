@@ -1,6 +1,6 @@
 // pages/LikedSongs.jsx
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { likesApi } from '../services/api/likes.api.js';
 import { toCard } from '../models/card.model.js';
 import { Card } from '../components/cards/Card.jsx';

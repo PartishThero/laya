@@ -1,7 +1,7 @@
 // App.jsx
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from '@/context/AuthContext.jsx';
+import { AuthProvider } from '@/features/auth/context/AuthContext.jsx';
 import { PrefsProvider } from '@/app/providers/PrefsContext.jsx';
 import { ToastProvider } from '@/app/providers/ToastContext.jsx';
 import { QueueProvider } from '@/features/player/context/QueueContext.jsx';
@@ -19,8 +19,8 @@ import Artist from '@/pages/Artist.jsx';
 import Search from '@/pages/Search.jsx';
 import Library from '@/pages/Library.jsx';
 import LikedSongs from '@/pages/LikedSongs.jsx';
-import Login from '@/pages/Login.jsx';
-import Signup from '@/pages/Signup.jsx';
+import Login from '@/features/auth/pages/Login.jsx';
+import Signup from '@/features/auth/pages/Signup.jsx';
 
 export default function App() {
   return (

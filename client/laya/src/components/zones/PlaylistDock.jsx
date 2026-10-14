@@ -1,7 +1,7 @@
 // components/zones/PlaylistDock.jsx
 import React, { useState, useEffect } from 'react';
 import { usePrefs } from '@/app/providers/PrefsContext.jsx';
-import { useAuth } from '../../context/AuthContext.jsx';
+import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { useDropZone } from '../../hooks/useDropZone.js';
 import { playlistsApi } from '../../services/api/playlists.api.js';
 import { CardArt } from '../cards/CardArt.jsx';

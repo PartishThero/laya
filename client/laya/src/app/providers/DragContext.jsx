@@ -5,7 +5,7 @@ import { hitTester } from '@/lib/dnd/hitTest.js';
 import { useQueue } from '@/features/player/context/QueueContext.jsx';
 import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
-import { useAuth } from '@/context/AuthContext.jsx';
+import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { playlistsApi } from '@/services/api/playlists.api.js';
 import { catalogueApi } from '@/services/api/catalogue.api.js';
 import { toCard } from '@/models/card.model.js';

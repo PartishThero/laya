@@ -1,6 +1,6 @@
 // pages/Library.jsx
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { playlistsApi } from '../services/api/playlists.api.js';
 import { likesApi } from '../services/api/likes.api.js';
 import { historyApi } from '../services/api/history.api.js';
