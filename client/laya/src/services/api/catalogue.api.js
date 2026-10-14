@@ -8,7 +8,7 @@ export const catalogueApi = {
     return await api.get(`/discover?${params.toString()}`);
   },
 
-  getSongs: async ({ page = 1, limit = 20, search = '', genre = '', artist = '', album = '' } = {}) => {
+  getSongs: async ({ page = 1, limit = 50, search = '', genre = '', artist = '', album = '' } = {}) => {
     const params = new URLSearchParams({ page, limit });
     if (search) params.append('search', search);
     if (genre) params.append('genre', genre);
@@ -19,6 +19,18 @@ export const catalogueApi = {
 
   getSong: async (id) => {
     return await api.get(`/songs/${id}`);
+  },
+
+  createSong: async (payload) => {
+    return await api.post('/songs', payload);
+  },
+
+  searchSpotify: async (q) => {
+    return await api.get(`/songs/spotify/search?q=${encodeURIComponent(q)}`);
+  },
+
+  deleteSong: async (id) => {
+    return await api.delete(`/songs/${id}`);
   },
 
   getAlbums: async ({ page = 1, limit = 20 } = {}) => {

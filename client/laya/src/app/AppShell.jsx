@@ -5,6 +5,7 @@ import { NowPlayingZone } from '@/features/player/components/NowPlayingZone.jsx'
 import { PlaylistDock } from '@/features/library/components/PlaylistDock.jsx';
 import { DragLayer } from '@/components/drag/DragLayer.jsx';
 import { FirstVisitHint } from '@/components/ui/FirstVisitHint.jsx';
+import { AddMusicModal } from '@/components/modals/AddMusicModal.jsx';
 
 export function AppShell({ children }) {
   return (
@@ -25,6 +26,7 @@ export function AppShell({ children }) {
       <NowPlayingZone />
       <DragLayer />
       <FirstVisitHint />
+      <AddMusicModal />
     </div>
   );
 }

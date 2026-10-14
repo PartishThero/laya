@@ -13,6 +13,8 @@ export function useChunkCards(visibleChunks, mode = 'home') {
   const inFlightRef = useRef(new Set()); // key -> boolean
   const sharedPlaylistsPromiseRef = useRef(null);
 
+  const [version, setVersion] = useState(0);
+
   useEffect(() => {
     // Check if mode changed; if so, clear cache and reset in-flight
     chunkCache.current.clear();
@@ -20,6 +22,19 @@ export function useChunkCards(visibleChunks, mode = 'home') {
     sharedPlaylistsPromiseRef.current = null;
     setChunks(new Map());
   }, [mode]);
+
+  useEffect(() => {
+    const handleSongAdded = () => {
+      chunkCache.current.clear();
+      inFlightRef.current.clear();
+      sharedPlaylistsPromiseRef.current = null;
+      setChunks(new Map());
+      setVersion(v => v + 1);
+    };
+
+    window.addEventListener('laya:song-added', handleSongAdded);
+    return () => window.removeEventListener('laya:song-added', handleSongAdded);
+  }, []);
 
   useEffect(() => {
     const toFetch = [];
@@ -121,7 +136,7 @@ export function useChunkCards(visibleChunks, mode = 'home') {
         return next;
       });
     });
-  }, [visibleChunks, mode]);
+  }, [visibleChunks, mode, version]);
 
   return { chunks, loadingChunks };
 }

@@ -1,11 +1,14 @@
 import Song from '../models/Song.js';
+import Artist from '../models/Artist.js';
+import Album from '../models/Album.js';
+import { spotifyService } from '../services/spotify.service.js';
 import fs from 'fs';
 import path from 'path';
 
 // GET /api/songs - list with optional pagination, search, genre filter
 export const getSongs = async (req, res, next) => {
   try {
-    const { page = 1, limit = 20, search = '', genre, artist, album } = req.query;
+    const { page = 1, limit = 50, search = '', genre, artist, album } = req.query;
     const query = { isPublished: true };
 
     if (search) {
@@ -62,6 +65,154 @@ export const getSong = async (req, res, next) => {
   }
 };
 
+// POST /api/songs - Create or upload song
+export const createSong = async (req, res, next) => {
+  try {
+    const {
+      title,
+      artistName,
+      albumTitle,
+      genre,
+      duration,
+      audioUrl: directAudioUrl,
+      coverUrl: directCoverUrl
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: 'Song title is required' });
+    }
+
+    // Determine audio URL
+    let finalAudioUrl = directAudioUrl?.trim();
+    if (req.files && req.files.audioFile && req.files.audioFile[0]) {
+      const audioFile = req.files.audioFile[0];
+      finalAudioUrl = `/uploads/audio/${audioFile.filename}`;
+    }
+
+    if (!finalAudioUrl) {
+      return res.status(400).json({ message: 'Audio file or audio URL is required' });
+    }
+
+    // Determine cover URL
+    let finalCoverUrl = directCoverUrl?.trim();
+    if (req.files && req.files.coverFile && req.files.coverFile[0]) {
+      const coverFile = req.files.coverFile[0];
+      finalCoverUrl = `/uploads/covers/${coverFile.filename}`;
+    }
+    if (!finalCoverUrl) {
+      finalCoverUrl = 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=600&auto=format&fit=crop&q=80';
+    }
+
+    // Resolve or create Artist
+    const cleanArtistName = (artistName || 'Unknown Artist').trim();
+    let artist = await Artist.findOne({ name: { $regex: new RegExp(`^${cleanArtistName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } });
+    if (!artist) {
+      artist = await Artist.create({
+        name: cleanArtistName,
+        bio: `${cleanArtistName} catalogue artist on Laya.`,
+        imageUrl: finalCoverUrl,
+        genres: genre ? [genre] : ['Vinyl']
+      });
+    }
+
+    // Resolve or create Album if provided
+    let albumId = null;
+    if (albumTitle && albumTitle.trim()) {
+      const cleanAlbumTitle = albumTitle.trim();
+      let album = await Album.findOne({
+        title: { $regex: new RegExp(`^${cleanAlbumTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+        artist: artist._id
+      });
+      if (!album) {
+        album = await Album.create({
+          title: cleanAlbumTitle,
+          artist: artist._id,
+          coverUrl: finalCoverUrl,
+          releaseDate: new Date()
+        });
+      }
+      albumId = album._id;
+    }
+
+    const parsedDuration = parseInt(duration, 10);
+    const finalDuration = (!isNaN(parsedDuration) && parsedDuration > 0) ? parsedDuration : 180;
+
+    const newSong = await Song.create({
+      title: title.trim(),
+      artist: artist._id,
+      album: albumId,
+      audioUrl: finalAudioUrl,
+      coverUrl: finalCoverUrl,
+      duration: finalDuration,
+      genre: genre?.trim() || 'Vinyl',
+      releaseDate: new Date(),
+      licence: 'User Library',
+      attribution: `${cleanArtistName} - ${title.trim()}`,
+      isPublished: true
+    });
+
+    const populatedSong = await Song.findById(newSong._id)
+      .populate('artist', 'name imageUrl')
+      .populate('album', 'title coverUrl');
+
+    res.status(201).json(populatedSong);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// GET /api/songs/spotify/search?q=... - search Spotify track catalogue
+export const searchSpotifyTracks = async (req, res, next) => {
+  try {
+    const { q } = req.query;
+    if (!q || !q.trim()) {
+      return res.json({ configured: spotifyService.isConfigured(), tracks: [] });
+    }
+
+    if (!spotifyService.isConfigured()) {
+      return res.json({
+        configured: false,
+        message: 'Spotify API credentials not yet configured in server/.env',
+        tracks: []
+      });
+    }
+
+    const results = await spotifyService.search(q.trim(), 'track', 10);
+    const rawTracks = results?.tracks?.items || [];
+
+    const mapped = rawTracks.map(t => ({
+      id: t.id,
+      title: t.name,
+      artist: t.artists?.map(a => a.name).join(', ') || 'Unknown Artist',
+      album: t.album?.name || '',
+      coverUrl: t.album?.images?.[0]?.url || '',
+      duration: Math.round((t.duration_ms || 180000) / 1000),
+      previewUrl: t.preview_url,
+      spotifyUrl: t.external_urls?.spotify
+    }));
+
+    res.json({
+      configured: true,
+      tracks: mapped
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// DELETE /api/songs/:id - delete a song
+export const deleteSong = async (req, res, next) => {
+  try {
+    const song = await Song.findByIdAndDelete(req.params.id);
+    if (!song) {
+      return res.status(404).json({ message: 'Song not found' });
+    }
+    res.json({ message: 'Song deleted successfully', songId: req.params.id });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // GET /api/songs/:id/stream - stream audio file with range support
 export const streamSong = async (req, res, next) => {
   try {
@@ -70,17 +221,18 @@ export const streamSong = async (req, res, next) => {
       return res.status(404).json({ message: 'Song not found' });
     }
 
-    // Resolve audio path safely
     let audioPath = song.audioUrl;
-    if (!path.isAbsolute(audioPath)) {
+    if (audioPath.startsWith('http://') || audioPath.startsWith('https://')) {
+      return res.redirect(audioPath);
+    }
+
+    if (audioPath.startsWith('/uploads') || audioPath.startsWith('uploads')) {
+      audioPath = path.resolve(process.cwd(), audioPath.replace(/^\//, ''));
+    } else if (!path.isAbsolute(audioPath)) {
       audioPath = path.resolve(process.cwd(), audioPath);
     }
 
     if (!fs.existsSync(audioPath)) {
-      // If local file does not exist, return 404 or redirect if it's an external URL
-      if (song.audioUrl.startsWith('http://') || song.audioUrl.startsWith('https://')) {
-        return res.redirect(song.audioUrl);
-      }
       return res.status(404).json({ message: 'Audio file not found on server' });
     }
 

@@ -12,6 +12,7 @@ import playlistRoutes from './routes/playlistRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
 import { getDiscovery } from './controllers/searchController.js';
+import path from 'path';
 import errorMiddleware from './middleware/errorMiddleware.js';
 
 dotenv.config();
@@ -28,6 +29,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Static file hosting for user-uploaded audio and cover artwork
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 
 // Only log failed requests (>= 400) to keep server console clean, unless DEBUG_HTTP=true
 app.use(morgan('dev', {

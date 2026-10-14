@@ -7,6 +7,7 @@ import { ToastProvider } from '@/app/providers/ToastContext.jsx';
 import { QueueProvider } from '@/features/player/context/QueueContext.jsx';
 import { PlayerProvider } from '@/features/player/context/PlayerContext.jsx';
 import { DragProvider } from '@/app/providers/DragContext.jsx';
+import { AddMusicProvider } from '@/app/providers/AddMusicContext.jsx';
 import { AppShell } from '@/app/AppShell.jsx';
 
 import Home from '@/features/library/pages/Home.jsx';
@@ -30,24 +31,26 @@ export default function App() {
           <QueueProvider>
             <PlayerProvider>
               <DragProvider>
-                <BrowserRouter>
-                  <AppShell>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/songs" element={<Songs />} />
-                      <Route path="/playlists" element={<Playlists />} />
-                      <Route path="/playlists/:id" element={<Playlist />} />
-                      <Route path="/albums" element={<Albums />} />
-                      <Route path="/albums/:id" element={<Album />} />
-                      <Route path="/artists/:id" element={<Artist />} />
-                      <Route path="/search" element={<Search />} />
-                      <Route path="/library" element={<Library />} />
-                      <Route path="/liked" element={<LikedSongs />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/signup" element={<Signup />} />
-                    </Routes>
-                  </AppShell>
-                </BrowserRouter>
+                <AddMusicProvider>
+                  <BrowserRouter>
+                    <AppShell>
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/songs" element={<Songs />} />
+                        <Route path="/playlists" element={<Playlists />} />
+                        <Route path="/playlists/:id" element={<Playlist />} />
+                        <Route path="/albums" element={<Albums />} />
+                        <Route path="/albums/:id" element={<Album />} />
+                        <Route path="/artists/:id" element={<Artist />} />
+                        <Route path="/search" element={<Search />} />
+                        <Route path="/library" element={<Library />} />
+                        <Route path="/liked" element={<LikedSongs />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
+                      </Routes>
+                    </AppShell>
+                  </BrowserRouter>
+                </AddMusicProvider>
               </DragProvider>
             </PlayerProvider>
           </QueueProvider>

@@ -80,7 +80,7 @@ class SpotifyService {
   }
 
   // Search Spotify tracks, albums, or artists
-  async search(query, types = 'track,album,artist', limit = 20) {
+  async search(query, types = 'track,album,artist', limit = 10) {
     const params = new URLSearchParams({
       q: query,
       type: types,

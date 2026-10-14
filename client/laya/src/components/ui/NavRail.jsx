@@ -4,11 +4,13 @@ import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { Wordmark } from '@/components/ui/Wordmark.jsx';
 import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { usePrefs } from '@/app/providers/PrefsContext.jsx';
-import { Sun, Moon, Search, List, Grid, LogOut, User } from 'lucide-react';
+import { useAddMusic } from '@/app/providers/AddMusicContext.jsx';
+import { Sun, Moon, Search, List, Grid, LogOut, User, Plus } from 'lucide-react';
 
 export function NavRail() {
   const { user, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme, isListView, toggleListView } = usePrefs();
+  const { openAddMusic } = useAddMusic();
   const navigate = useNavigate();
 
   const navItems = [
@@ -47,6 +49,16 @@ export function NavRail() {
 
       {/* RIGHT: Search, View Toggle, Theme, User */}
       <div className="flex items-center gap-3">
+        {/* Add Music button */}
+        <button
+          onClick={openAddMusic}
+          className="px-2.5 py-1.5 bg-ink text-paper hover:bg-accent rounded-xs transition-colors flex items-center gap-1.5 text-xs font-mono cursor-pointer shadow-xs"
+          title="Add song or vinyl to collection"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Add Music</span>
+        </button>
+
         {/* Search button */}
         <NavLink
           to="/search"

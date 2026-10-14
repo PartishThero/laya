@@ -7,6 +7,7 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts.js';
 import { usePrefs } from '@/app/providers/PrefsContext.jsx';
 import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { useDrag } from '@/app/providers/DragContext.jsx';
+import { useAddMusic } from '@/app/providers/AddMusicContext.jsx';
 import { getVisibleWorldBounds, screenToWorld } from '@/features/canvas/engines/viewport.js';
 import { getVisibleChunkCoords } from '@/features/canvas/engines/chunks.js';
 import { CanvasBackground } from '@/features/canvas/components/CanvasBackground.jsx';
@@ -16,11 +17,13 @@ import { PositionNote } from '@/features/canvas/components/PositionNote.jsx';
 import { ReturnHome } from '@/features/canvas/components/ReturnHome.jsx';
 import { Card } from '@/components/cards/Card.jsx';
 import { CANVAS_MODES } from '@/features/canvas/engines/canvasModes.js';
+import { Plus, Disc } from 'lucide-react';
 
 export function Canvas({ mode = 'home' }) {
   const containerRef = useRef(null);
   const { isListView } = usePrefs();
   const { playCard } = usePlayer();
+  const { openAddMusic } = useAddMusic();
   const { registerCanvasDropHandler } = useDrag();
   const { positions, movedCardsList, moveCard, isCardMoved } = useCardPositions(mode);
 
@@ -126,17 +129,36 @@ export function Canvas({ mode = 'home' }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {allCardsList.map(card => (
-              <div key={card.id} className="flex justify-center">
-                <Card
-                  card={card}
-                  tilt={0}
-                  onClick={() => playCard(card, allCardsList)}
-                />
-              </div>
-            ))}
-          </div>
+          {allCardsList.length === 0 ? (
+            <div className="py-16 text-center border border-dashed border-rule rounded-sm p-8 max-w-md mx-auto">
+              <Disc className="w-10 h-10 mx-auto mb-3 text-accent animate-pulse" />
+              <h3 className="font-serif italic text-xl text-ink">
+                Catalogue is empty.
+              </h3>
+              <p className="font-mono text-xs text-ink-soft mt-1 mb-5">
+                Upload audio files or search Spotify to add your first track.
+              </p>
+              <button
+                onClick={openAddMusic}
+                className="px-4 py-2 bg-ink text-paper rounded-xs hover:bg-accent font-mono text-xs transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Record</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {allCardsList.map(card => (
+                <div key={card.id} className="flex justify-center">
+                  <Card
+                    card={card}
+                    tilt={0}
+                    onClick={() => playCard(card, allCardsList)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         /* 2D CANVAS PLANE */
@@ -144,8 +166,38 @@ export function Canvas({ mode = 'home' }) {
           {/* Subtle moving dot/rule background */}
           <CanvasBackground viewport={viewport} />
 
+          {/* Empty state invitation when no records are on the table */}
+          {allCardsList.length === 0 && loadingChunks.size === 0 && (
+            <div
+              className="absolute pointer-events-auto z-20 flex flex-col items-center justify-center text-center p-8 border border-dashed border-rule/80 bg-paper/95 backdrop-blur-md rounded-sm shadow-lg max-w-sm"
+              style={{
+                left: `${viewport.x + (typeof window !== 'undefined' ? window.innerWidth : 1200) / 2 - 180}px`,
+                top: `${viewport.y + (typeof window !== 'undefined' ? window.innerHeight : 800) / 2 - 140}px`,
+                transform: `scale(${viewport.scale})`,
+                transformOrigin: 'center center'
+              }}
+            >
+              <div className="w-14 h-14 rounded-full bg-paper-tint/60 border border-rule flex items-center justify-center mb-3">
+                <Disc className="w-7 h-7 text-accent" />
+              </div>
+              <h3 className="font-serif italic text-2xl text-ink">
+                The turntable is empty.
+              </h3>
+              <p className="font-mono text-xs text-ink-soft mt-1.5 mb-5 max-w-xs leading-relaxed">
+                Add songs from your computer files, audio stream links, or Spotify to place your first record onto the table.
+              </p>
+              <button
+                onClick={openAddMusic}
+                className="px-5 py-2.5 bg-ink text-paper rounded-xs hover:bg-accent font-mono text-xs transition-colors flex items-center gap-2 cursor-pointer shadow-md hover:shadow-lg"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Your First Record</span>
+              </button>
+            </div>
+          )}
+
           {/* Time of day gentle editorial greeting anchored near origin */}
-          {mode === 'home' && isAtOrigin && (
+          {mode === 'home' && isAtOrigin && allCardsList.length > 0 && (
             <div
               className="absolute pointer-events-none transition-opacity duration-300 z-10"
               style={{
