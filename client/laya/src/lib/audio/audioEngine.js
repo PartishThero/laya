@@ -1,127 +1,281 @@
-// services/audio/audioEngine.js
-// Singleton audio engine existing outside the React component tree
+// lib/audio/audioEngine.js
+// Audio engine external store outside the React component tree
+
+import {
+  updateMediaSession,
+  updateMediaSessionPlaybackState,
+  updateMediaSessionPositionState
+} from './mediaSession.js';
 
 class AudioEngine {
   constructor() {
-    this.audio = new Audio();
-    this.audio.preload = 'metadata';
+    this.audio = typeof Audio !== 'undefined' ? new Audio() : null;
+    if (this.audio) {
+      this.audio.preload = 'metadata';
+    }
+
     this.listeners = new Set();
-    this.currentTrack = null;
+    this.timeListeners = new Set();
+    this.eventListeners = new Map(); // event -> Set(callbacks)
+
+    this.currentTime = 0;
     this.state = {
+      currentTrack: null,
       isPlaying: false,
-      currentTime: 0,
+      isPaused: false,
+      isBuffering: false,
       duration: 0,
       volume: 0.8,
       isMuted: false,
-      isLoading: false,
       error: null
     };
 
-    this.audio.volume = this.state.volume;
+    if (this.audio) {
+      this.audio.volume = this.state.volume;
+    }
+
+    this.playId = 0;
+    this.retryCount = 0;
+    this.maxRetries = 2;
+    this.retryTimer = null;
+    this.toastHandler = null;
+    this.mediaHandlers = {};
+
     this._bindEvents();
   }
 
   _bindEvents() {
+    if (!this.audio) return;
+
     this.audio.addEventListener('play', () => {
-      this._updateState({ isPlaying: true, error: null });
+      this._updateState({ isPlaying: true, isPaused: false, isBuffering: false, error: null });
+      updateMediaSessionPlaybackState('playing');
     });
 
     this.audio.addEventListener('pause', () => {
-      this._updateState({ isPlaying: false });
+      // If we didn't end or change tracks, mark paused
+      if (this.state.currentTrack) {
+        this._updateState({ isPlaying: false, isPaused: true, isBuffering: false });
+        updateMediaSessionPlaybackState('paused');
+      }
     });
 
     this.audio.addEventListener('timeupdate', () => {
-      this._updateState({
-        currentTime: this.audio.currentTime,
-        duration: this.audio.duration || 0
+      this.currentTime = this.audio.currentTime || 0;
+      this._emitTime();
+      updateMediaSessionPositionState({
+        duration: this.state.duration,
+        position: this.currentTime
       });
     });
 
     this.audio.addEventListener('loadedmetadata', () => {
+      const dur = this.audio.duration || this.state.currentTrack?.meta?.duration || 0;
       this._updateState({
-        duration: this.audio.duration || 0,
-        isLoading: false
+        duration: dur,
+        isBuffering: false
+      });
+      updateMediaSessionPositionState({
+        duration: dur,
+        position: this.currentTime
       });
     });
 
     this.audio.addEventListener('waiting', () => {
-      this._updateState({ isLoading: true });
+      this._updateState({ isBuffering: true });
     });
 
     this.audio.addEventListener('playing', () => {
-      this._updateState({ isLoading: false });
+      this.retryCount = 0;
+      this._updateState({ isBuffering: false, isPlaying: true, isPaused: false });
+      updateMediaSessionPlaybackState('playing');
     });
 
     this.audio.addEventListener('ended', () => {
-      this._updateState({ isPlaying: false, currentTime: 0 });
+      this.currentTime = 0;
+      this._emitTime();
+      this._updateState({ isPlaying: false, isPaused: false, isBuffering: false });
+      updateMediaSessionPlaybackState('paused');
       this._emit('ended');
     });
 
-    this.audio.addEventListener('error', (e) => {
-      const err = this.audio.error;
-      const msg = err ? `Audio playback error (${err.code})` : 'Failed to load audio';
-      this._updateState({ isPlaying: false, isLoading: false, error: msg });
-      this._emit('error', msg);
+    this.audio.addEventListener('error', () => {
+      if (this.retryCount < this.maxRetries) {
+        this.retryCount++;
+        this._updateState({ isBuffering: true, error: null });
+        clearTimeout(this.retryTimer);
+        this.retryTimer = setTimeout(() => {
+          if (this.state.currentTrack && this.audio) {
+            this.audio.load();
+            this.play().catch(() => {});
+          }
+        }, 800);
+      } else {
+        const err = this.audio.error;
+        const msg = err ? `Audio playback error (${err.code})` : 'Failed to load audio stream';
+        this._updateState({ isPlaying: false, isPaused: false, isBuffering: false, error: msg });
+        updateMediaSessionPlaybackState('none');
+        this._emit('error', msg);
+
+        if (this.toastHandler) {
+          const trackTitle = this.state.currentTrack?.title || 'track';
+          this.toastHandler(`Stream error: unable to play "${trackTitle}" after 2 retries.`, 'error');
+        }
+      }
     });
   }
 
   _updateState(partial) {
     this.state = { ...this.state, ...partial };
-    this._emit('change', this.state);
-  }
-
-  _emit(eventName, payload) {
-    this.listeners.forEach(fn => {
+    this.listeners.forEach(listener => {
       try {
-        fn(eventName, payload, this.state);
+        listener();
       } catch (e) {
-        console.error('AudioEngine listener error:', e);
+        console.error('AudioEngine state listener error:', e);
       }
     });
   }
 
-  subscribe(callback) {
-    this.listeners.add(callback);
-    // Send initial state immediately
-    callback('init', null, this.state);
+  _emitTime() {
+    this.timeListeners.forEach(listener => {
+      try {
+        listener();
+      } catch (e) {
+        console.error('AudioEngine time listener error:', e);
+      }
+    });
+  }
+
+  _emit(eventName, payload) {
+    const cbs = this.eventListeners.get(eventName);
+    if (cbs) {
+      cbs.forEach(cb => {
+        try {
+          cb(payload);
+        } catch (e) {
+          console.error(`AudioEngine ${eventName} event error:`, e);
+        }
+      });
+    }
+  }
+
+  on(eventName, callback) {
+    if (!this.eventListeners.has(eventName)) {
+      this.eventListeners.set(eventName, new Set());
+    }
+    this.eventListeners.get(eventName).add(callback);
     return () => {
-      this.listeners.delete(callback);
+      this.eventListeners.get(eventName)?.delete(callback);
     };
   }
 
-  load(track) {
-    if (!track || !track.audioUrl) {
-      console.warn('Cannot play track without audioUrl:', track);
-      return;
+  // External store interface for React useSyncExternalStore
+  subscribe = (listener) => {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  };
+
+  getSnapshot = () => {
+    return this.state;
+  };
+
+  // Separate external store interface for currentTime
+  subscribeTime = (listener) => {
+    this.timeListeners.add(listener);
+    return () => {
+      this.timeListeners.delete(listener);
+    };
+  };
+
+  getTimeSnapshot = () => {
+    return this.currentTime;
+  };
+
+  setToastHandler(handler) {
+    this.toastHandler = handler;
+  }
+
+  setMediaSessionHandlers(handlers) {
+    this.mediaHandlers = { ...this.mediaHandlers, ...handlers };
+    if (this.state.currentTrack) {
+      updateMediaSession(this.state.currentTrack, this.mediaHandlers);
+    }
+  }
+
+  async load(track) {
+    if (!track || !this.audio) return;
+    const currentPlayId = ++this.playId;
+    clearTimeout(this.retryTimer);
+    this.retryCount = 0;
+
+    // Reset playback
+    try {
+      this.audio.pause();
+    } catch {
+      // Ignore pause errors
     }
 
-    this.currentTrack = track;
-    this.audio.src = track.audioUrl;
-    this.audio.load();
+    this.currentTime = 0;
+    this._emitTime();
+
+    const trackDuration = track.meta?.duration || 0;
     this._updateState({
-      currentTime: 0,
-      duration: track.meta?.duration || 0,
-      isLoading: true,
+      currentTrack: track,
+      duration: trackDuration,
+      isPlaying: false,
+      isPaused: false,
+      isBuffering: true,
       error: null
     });
 
-    this.play().catch(err => {
-      console.warn('Autoplay prevented or failed:', err);
-    });
+    updateMediaSession(track, this.mediaHandlers);
+    updateMediaSessionPlaybackState('playing');
+
+    if (track.audioUrl) {
+      this.audio.src = track.audioUrl;
+      this.audio.load();
+
+      try {
+        const promise = this.audio.play();
+        if (promise !== undefined) {
+          await promise;
+        }
+      } catch (err) {
+        // BUG-04: Ignore AbortError and stale promises when track was switched
+        if (currentPlayId !== this.playId || err.name === 'AbortError') {
+          return;
+        }
+        console.warn('Autoplay prevented or failed:', err);
+      }
+    }
   }
 
   async play() {
-    if (!this.audio.src) return;
+    if (!this.audio || !this.audio.src) return;
+    const currentPlayId = ++this.playId;
     try {
-      await this.audio.play();
+      const promise = this.audio.play();
+      if (promise !== undefined) {
+        await promise;
+      }
     } catch (err) {
-      this._updateState({ isPlaying: false, isLoading: false });
+      // BUG-04: Ignore AbortError and stale play calls
+      if (currentPlayId !== this.playId || err.name === 'AbortError') {
+        return;
+      }
+      this._updateState({ isPlaying: false, isBuffering: false });
       throw err;
     }
   }
 
   pause() {
+    if (!this.audio) return;
+    this.playId++;
     this.audio.pause();
+    this._updateState({ isPlaying: false, isPaused: true, isBuffering: false });
+    updateMediaSessionPlaybackState('paused');
   }
 
   togglePlay() {
@@ -133,12 +287,19 @@ class AudioEngine {
   }
 
   seek(seconds) {
-    if (isNaN(seconds)) return;
-    this.audio.currentTime = seconds;
-    this._updateState({ currentTime: seconds });
+    if (!this.audio || isNaN(seconds)) return;
+    const target = Math.max(0, Math.min(seconds, this.state.duration || seconds));
+    this.currentTime = target;
+    this.audio.currentTime = target;
+    this._emitTime();
+    updateMediaSessionPositionState({
+      duration: this.state.duration,
+      position: target
+    });
   }
 
   setVolume(vol) {
+    if (!this.audio) return;
     const clamped = Math.max(0, Math.min(1, vol));
     this.audio.volume = clamped;
     this.audio.muted = clamped === 0;
@@ -146,6 +307,7 @@ class AudioEngine {
   }
 
   toggleMute() {
+    if (!this.audio) return;
     const nextMuted = !this.state.isMuted;
     this.audio.muted = nextMuted;
     this._updateState({ isMuted: nextMuted });
