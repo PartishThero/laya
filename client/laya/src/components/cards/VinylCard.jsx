@@ -199,9 +199,11 @@ export function VinylCard({
               className="vinyl-bar block w-[0.45cqw] origin-center rounded-full bg-neutral-600"
               style={{
                 height: `${h * 3.6}cqw`,
-                animation: isPlaying
-                  ? `vinyl-eq ${0.9 + i * 0.17}s ease-in-out ${i * -0.23}s infinite`
-                  : 'none',
+                animationName: isPlaying ? 'vinyl-eq' : 'none',
+                animationDuration: `${0.9 + i * 0.17}s`,
+                animationTimingFunction: 'ease-in-out',
+                animationDelay: `${i * -0.23}s`,
+                animationIterationCount: 'infinite',
                 animationPlayState: isPaused ? 'paused' : 'running',
               }}
             />
