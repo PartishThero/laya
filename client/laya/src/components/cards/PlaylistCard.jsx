@@ -3,7 +3,7 @@ import React from 'react';
 import { CardArt } from './CardArt.jsx';
 import { CardKindMark } from './CardKindMark.jsx';
 
-export function PlaylistCard({ card, isPlaying = false }) {
+export const PlaylistCard = React.memo(function PlaylistCard({ card, isPlaying = false }) {
   return (
     <div className="w-[210px] h-[170px] relative flex flex-col justify-between bg-paper-2 border border-rule shadow-[0_2px_10px_rgba(0,0,0,0.07)] rounded-sm group overflow-hidden">
       {/* Folder tab design */}
@@ -41,4 +41,4 @@ export function PlaylistCard({ card, isPlaying = false }) {
       </div>
     </div>
   );
-}
+});
