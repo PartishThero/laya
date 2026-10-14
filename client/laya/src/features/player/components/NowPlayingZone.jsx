@@ -1,6 +1,6 @@
 // components/zones/NowPlayingZone.jsx
 import React, { useState } from 'react';
-import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
+import { usePlayer, usePlaybackTime } from '@/features/player/context/PlayerContext.jsx';
 import { useDropZone } from '@/hooks/useDropZone.js';
 import { CardArt } from '@/components/cards/CardArt.jsx';
 import { QueuePile } from '@/features/player/components/QueuePile.jsx';
@@ -12,7 +12,6 @@ export function NowPlayingZone() {
   const {
     currentTrack,
     isPlaying,
-    currentTime,
     duration,
     volume,
     isMuted,
@@ -24,6 +23,7 @@ export function NowPlayingZone() {
     setVolume,
     toggleMute
   } = usePlayer();
+  const currentTime = usePlaybackTime();
 
   const [collapsed, setCollapsed] = useState(false);
 
