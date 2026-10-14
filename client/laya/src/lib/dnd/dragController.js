@@ -1,5 +1,6 @@
-// engines/dnd/dragController.js
-// Pointer-based Drag state machine: idle -> lifted -> over-target -> dropped(pending) -> confirmed | failed
+// lib/dnd/dragController.js
+// Pointer-based Drag state machine with integrated edge auto-pan loop
+import { calculateEdgeAutoPan } from '@/lib/dnd/autoPan.js';
 
 export const DRAG_STATES = {
   IDLE: 'idle',
@@ -13,6 +14,9 @@ export const DRAG_STATES = {
 export class DragController {
   constructor() {
     this.listeners = new Set();
+    this.autoPanRaf = null;
+    this.onPanCanvas = null;
+
     this.state = {
       status: DRAG_STATES.IDLE,
       card: null,
@@ -40,7 +44,10 @@ export class DragController {
     }
   }
 
-  startLift(card, origin) {
+  startLift(card, origin, onPanCanvas = null) {
+    this.stopAutoPan();
+    this.onPanCanvas = onPanCanvas;
+
     this.state = {
       status: DRAG_STATES.LIFTED,
       card,
@@ -51,6 +58,50 @@ export class DragController {
       error: null
     };
     this._notify();
+
+    if (this.onPanCanvas) {
+      this._startAutoPan();
+    }
+  }
+
+  _startAutoPan() {
+    this.stopAutoPan();
+
+    const loop = () => {
+      if (
+        this.state.status === DRAG_STATES.IDLE ||
+        this.state.status === DRAG_STATES.CONFIRMED ||
+        this.state.status === DRAG_STATES.FAILED
+      ) {
+        this.stopAutoPan();
+        return;
+      }
+
+      const cur = this.state.current;
+      if (cur && this.onPanCanvas && typeof window !== 'undefined') {
+        const { panX, panY } = calculateEdgeAutoPan(
+          cur.screenX,
+          cur.screenY,
+          window.innerWidth,
+          window.innerHeight
+        );
+        if (panX !== 0 || panY !== 0) {
+          this.onPanCanvas(panX, panY);
+        }
+      }
+
+      this.autoPanRaf = requestAnimationFrame(loop);
+    };
+
+    this.autoPanRaf = requestAnimationFrame(loop);
+  }
+
+  stopAutoPan() {
+    if (this.autoPanRaf) {
+      cancelAnimationFrame(this.autoPanRaf);
+      this.autoPanRaf = null;
+    }
+    this.onPanCanvas = null;
   }
 
   updatePosition(screenX, screenY, hitResult = null) {
@@ -70,6 +121,7 @@ export class DragController {
   }
 
   dropPending(target) {
+    this.stopAutoPan();
     this.state = {
       ...this.state,
       status: DRAG_STATES.DROPPED_PENDING,
@@ -79,6 +131,7 @@ export class DragController {
   }
 
   confirm() {
+    this.stopAutoPan();
     this.state = {
       ...this.state,
       status: DRAG_STATES.CONFIRMED
@@ -91,6 +144,7 @@ export class DragController {
   }
 
   fail(errorMsg = 'Action failed') {
+    this.stopAutoPan();
     this.state = {
       ...this.state,
       status: DRAG_STATES.FAILED,
@@ -104,10 +158,12 @@ export class DragController {
   }
 
   cancel() {
+    this.stopAutoPan();
     this.reset();
   }
 
   reset() {
+    this.stopAutoPan();
     this.state = {
       status: DRAG_STATES.IDLE,
       card: null,

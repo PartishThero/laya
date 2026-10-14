@@ -1,42 +1,36 @@
 // hooks/useDraggableCard.js
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { dragController } from '@/lib/dnd/dragController.js';
 import { hitTester } from '@/lib/dnd/hitTest.js';
-import { calculateEdgeAutoPan } from '@/lib/dnd/autoPan.js';
 
 export function useDraggableCard({ card, onClick, tilt = 0, onPanCanvas }) {
   const pointerStartRef = useRef(null);
   const isDraggingCardRef = useRef(false);
   const longPressTimerRef = useRef(null);
-  const autoPanRafRef = useRef(null);
+
+  // Clean up any pending long-press timers on unmount
+  useEffect(() => {
+    return () => {
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
+    };
+  }, []);
 
   const startDrag = useCallback((e, startPoint) => {
     isDraggingCardRef.current = true;
 
-    dragController.startLift(card, {
-      screenX: startPoint.x,
-      screenY: startPoint.y,
-      tilt
-    });
-
-    // Start auto-pan loop while dragging
-    const runAutoPan = () => {
-      const cur = dragController.state.current;
-      if (cur && onPanCanvas) {
-        const { panX, panY } = calculateEdgeAutoPan(
-          cur.screenX,
-          cur.screenY,
-          window.innerWidth,
-          window.innerHeight
-        );
-        if (panX !== 0 || panY !== 0) {
-          onPanCanvas(panX, panY);
-        }
-      }
-      autoPanRafRef.current = requestAnimationFrame(runAutoPan);
-    };
-
-    autoPanRafRef.current = requestAnimationFrame(runAutoPan);
+    // DragController owns the auto-pan requestAnimationFrame loop
+    dragController.startLift(
+      card,
+      {
+        screenX: startPoint.x,
+        screenY: startPoint.y,
+        tilt
+      },
+      onPanCanvas
+    );
   }, [card, tilt, onPanCanvas]);
 
   const handlePointerDown = useCallback((e) => {
@@ -84,11 +78,6 @@ export function useDraggableCard({ card, onClick, tilt = 0, onPanCanvas }) {
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current);
       longPressTimerRef.current = null;
-    }
-
-    if (autoPanRafRef.current) {
-      cancelAnimationFrame(autoPanRafRef.current);
-      autoPanRafRef.current = null;
     }
 
     if (!isDraggingCardRef.current) {
