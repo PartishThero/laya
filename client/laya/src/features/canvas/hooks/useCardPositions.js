@@ -1,15 +1,26 @@
 // features/canvas/hooks/useCardPositions.js
-// Spatial persistence and positioning state for user-moved canvas cards
+// Spatial persistence and positioning state for user-moved canvas cards (individual user-specific)
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 
 const STORAGE_PREFIX = 'laya_card_positions_';
 
 export function useCardPositions(mode = 'home') {
-  const storageKey = `${STORAGE_PREFIX}${mode}`;
+  const { user } = useAuth();
+  const userId = user?._id || user?.id || user?.username || 'guest';
+  const storageKey = `${STORAGE_PREFIX}${userId}_${mode}`;
 
   const [positions, setPositions] = useState(() => {
     try {
-      const saved = localStorage.getItem(storageKey);
+      // Check user-specific key, or migrate from legacy shared key if available
+      let saved = localStorage.getItem(storageKey);
+      if (!saved) {
+        const legacy = localStorage.getItem(`${STORAGE_PREFIX}${mode}`);
+        if (legacy) {
+          saved = legacy;
+          localStorage.setItem(storageKey, legacy);
+        }
+      }
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
@@ -18,10 +29,17 @@ export function useCardPositions(mode = 'home') {
 
   const highestZIndexRef = useRef(100);
 
-  // Sync positions when canvas mode changes
+  // Sync positions when individual user or canvas mode changes
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(storageKey);
+      let saved = localStorage.getItem(storageKey);
+      if (!saved) {
+        const legacy = localStorage.getItem(`${STORAGE_PREFIX}${mode}`);
+        if (legacy) {
+          saved = legacy;
+          localStorage.setItem(storageKey, legacy);
+        }
+      }
       const parsed = saved ? JSON.parse(saved) : {};
       setPositions(parsed);
 
@@ -35,7 +53,7 @@ export function useCardPositions(mode = 'home') {
     } catch {
       setPositions({});
     }
-  }, [storageKey]);
+  }, [storageKey, mode]);
 
   // Place or move a card to an arbitrary world coordinate
   const moveCard = useCallback((card, worldX, worldY, tilt = 0) => {
