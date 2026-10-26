@@ -16,16 +16,24 @@ import { RoamingZone } from '@/features/library/components/RoamingZone.jsx';
 import { PositionNote } from '@/features/canvas/components/PositionNote.jsx';
 import { ReturnHome } from '@/features/canvas/components/ReturnHome.jsx';
 import { Card } from '@/components/cards/Card.jsx';
-import { CANVAS_MODES } from '@/features/canvas/engines/canvasModes.js';
-import { Plus, Disc } from 'lucide-react';
+import { useToast } from '@/app/providers/ToastContext.jsx';
+import { Plus, Disc, Trash2, X } from 'lucide-react';
 
 export function Canvas({ mode = 'home' }) {
   const containerRef = useRef(null);
   const { isListView } = usePrefs();
   const { playCard } = usePlayer();
+  const { addToast } = useToast();
   const { openAddMusic } = useAddMusic();
   const { registerCanvasDropHandler } = useDrag();
-  const { positions, movedCardsList, moveCard, isCardMoved } = useCardPositions(mode);
+  const {
+    positions,
+    movedCardsList,
+    moveCard,
+    isCardMoved,
+    removeMovedCard,
+    resetPositions
+  } = useCardPositions(mode);
 
   const {
     viewport,
@@ -242,7 +250,7 @@ export function Canvas({ mode = 'home' }) {
             {movedCardsList.map(item => (
               <div
                 key={item.card.id}
-                className="absolute pointer-events-auto"
+                className="absolute pointer-events-auto group/card-wrapper"
                 style={{
                   transform: `translate3d(${item.worldX}px, ${item.worldY}px, 0)`,
                   zIndex: item.zIndex || 50
@@ -254,6 +262,19 @@ export function Canvas({ mode = 'home' }) {
                   onClick={(c) => playCard(c, allCardsList)}
                   onPanCanvas={panBy}
                 />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeMovedCard(item.card.id);
+                    addToast(`Removed "${item.card.title}" from table`, 'info');
+                  }}
+                  className="absolute -top-2.5 -right-2.5 w-6 h-6 rounded-full bg-paper border border-rule shadow-sm opacity-0 group-hover/card-wrapper:opacity-100 hover:bg-accent hover:text-paper hover:border-accent flex items-center justify-center transition-all z-[90] cursor-pointer"
+                  title="Remove card from table"
+                  aria-label="Remove card from table"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
               </div>
             ))}
 
@@ -268,6 +289,20 @@ export function Canvas({ mode = 'home' }) {
               onClick={glideToOrigin}
               isOffset={!isAtOrigin}
             />
+            {allCardsList.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  resetPositions();
+                  addToast('Table cleared', 'info');
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono text-ink-soft hover:text-accent bg-paper/90 backdrop-blur-sm border border-rule hover:border-accent shadow-xs rounded-sm transition-colors cursor-pointer select-none"
+                title="Clear all cards from the table"
+              >
+                <Trash2 className="w-3 h-3" />
+                <span className="font-serif italic">Clear table</span>
+              </button>
+            )}
           </div>
         </>
       )}

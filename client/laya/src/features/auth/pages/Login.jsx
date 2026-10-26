@@ -38,74 +38,79 @@ export default function Login() {
       {/* Top Left Return Button */}
       <Link
         to="/"
-        className="absolute top-6 left-6 p-2 rounded-xs border border-rule hover:border-accent text-ink-soft hover:text-ink transition-colors flex items-center gap-1.5 text-xs font-mono"
+        className="absolute top-6 left-6 p-2 rounded-md text-ink-faint hover:text-ink transition-all duration-200 flex items-center gap-1.5 text-xs font-mono group"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
         <span>Return to table</span>
       </Link>
 
-      <div className="w-full max-w-sm bg-paper-2 border border-rule p-8 rounded-sm shadow-xl">
-        <div className="text-center mb-8">
-          <span className="font-serif italic font-bold text-3xl text-ink">
-            laya
-          </span>
-          <h1 className="font-serif text-lg font-medium text-ink mt-2">
-            Welcome back to the table
-          </h1>
-          <p className="font-mono text-xs text-ink-soft mt-1">
-            Access your playlists, saved music, and archive.
-          </p>
-        </div>
+      <div className="w-full max-w-sm page-enter">
+        {/* Decorative accent line */}
+        <div className="accent-line mx-auto mb-8" />
 
-        {error && (
-          <div className="mb-4 p-2.5 bg-paper text-danger text-xs font-mono border border-danger/40 rounded-xs">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4 font-mono text-xs">
-          <div>
-            <label className="block text-ink-soft mb-1 uppercase tracking-wider text-[10px]">
-              Username or Email
-            </label>
-            <input
-              type="text"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="curator or curator@laya.fm"
-              className="w-full px-3 py-2 bg-paper border border-rule rounded-xs text-ink font-serif text-sm outline-none focus:border-accent"
-              required
-            />
+        <div className="bg-paper-2/80 border border-rule/40 p-8 rounded-xl shadow-xl">
+          <div className="text-center mb-8">
+            <span className="font-serif italic font-bold text-3xl text-ink tracking-tight">
+              laya
+            </span>
+            <h1 className="font-serif text-lg font-medium text-ink mt-3">
+              Welcome back to the table
+            </h1>
+            <p className="font-mono text-xs text-ink-faint mt-1.5">
+              Access your playlists, saved music, and archive.
+            </p>
           </div>
 
-          <div>
-            <label className="block text-ink-soft mb-1 uppercase tracking-wider text-[10px]">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-3 py-2 bg-paper border border-rule rounded-xs text-ink font-serif text-sm outline-none focus:border-accent"
-              required
-            />
+          {error && (
+            <div className="mb-5 p-3 bg-danger/8 text-danger text-xs font-mono border border-danger/20 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-ink-faint mb-1.5 uppercase tracking-wider text-[10px] font-mono">
+                Username or Email
+              </label>
+              <input
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="curator or curator@laya.fm"
+                className="input-premium"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-ink-faint mb-1.5 uppercase tracking-wider text-[10px] font-mono">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="input-premium"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full !py-3 !rounded-lg mt-2"
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enter Archive'}
+            </button>
+          </form>
+
+          <div className="mt-8 pt-5 border-t border-rule/30 text-center font-mono text-xs text-ink-faint">
+            <span>First time here? </span>
+            <Link to="/signup" className="text-accent hover:underline font-medium">
+              Create an account
+            </Link>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 bg-ink text-paper font-mono text-xs rounded-xs hover:bg-accent transition-colors cursor-pointer flex items-center justify-center gap-2 mt-2 shadow-xs"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enter Archive'}
-          </button>
-        </form>
-
-        <div className="mt-6 pt-4 border-t border-rule/50 text-center font-mono text-xs text-ink-soft">
-          <span>First time here? </span>
-          <Link to="/signup" className="text-accent hover:underline font-medium">
-            Create an account
-          </Link>
         </div>
       </div>
     </div>

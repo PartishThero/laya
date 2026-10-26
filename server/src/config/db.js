@@ -9,7 +9,7 @@ const connectDB = async () => {
     if (!mongoUri) {
       throw new Error('MONGODB_URI or DBuri is not defined in environment variables');
     }
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(mongoUri, { family: 4 });
     console.log('MongoDB connected successfully');
   } catch (err) {
     console.error('MongoDB connection error:', err.message);

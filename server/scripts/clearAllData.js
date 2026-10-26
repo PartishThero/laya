@@ -23,9 +23,11 @@ if (!mongoUri) {
   process.exit(1);
 }
 
+import fs from 'fs';
+
 const clearAll = async () => {
   try {
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(mongoUri, { family: 4 });
     console.log('✅ Connected to MongoDB. Clearing all music and catalogue data...');
 
     const songCount = await Song.countDocuments();
@@ -46,7 +48,24 @@ const clearAll = async () => {
     console.log(`🧹 Deleted ${artistCount} artists`);
     console.log(`🧹 Deleted ${playlistCount} playlists`);
     console.log(`🧹 Deleted ${eventCount} listening events`);
-    console.log('✨ All data has been completely removed from database!');
+
+    // Clean uploads directory
+    const uploadsDir = path.resolve(__dirname, '../uploads');
+    const audioDir = path.join(uploadsDir, 'audio');
+    const coversDir = path.join(uploadsDir, 'covers');
+
+    [audioDir, coversDir].forEach(dir => {
+      if (fs.existsSync(dir)) {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+          if (file.startsWith('.')) continue;
+          fs.unlinkSync(path.join(dir, file));
+          console.log(`🧹 Removed uploaded file: ${file}`);
+        }
+      }
+    });
+
+    console.log('✨ All data and uploaded files have been completely removed!');
 
     process.exit(0);
   } catch (err) {

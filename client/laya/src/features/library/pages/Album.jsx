@@ -8,7 +8,7 @@ import { useQueue } from '@/features/player/context/QueueContext.jsx';
 import { useToast } from '@/app/providers/ToastContext.jsx';
 import { CardArt } from '@/components/cards/CardArt.jsx';
 import { formatTime, formatDate } from '@/lib/time.js';
-import { Play, Plus, ArrowLeft, Loader2 } from 'lucide-react';
+import { Play, Plus, ArrowLeft, Loader2, Disc3, Clock } from 'lucide-react';
 
 export default function Album() {
   const { id } = useParams();
@@ -29,17 +29,19 @@ export default function Album() {
 
   if (loading) {
     return (
-      <div className="w-full h-full pt-32 flex items-center justify-center">
+      <div className="w-full h-full pt-32 flex flex-col items-center justify-center gap-3">
         <Loader2 className="w-6 h-6 text-accent animate-spin" />
+        <span className="text-xs font-mono text-ink-faint">Loading album…</span>
       </div>
     );
   }
 
   if (error || !album) {
     return (
-      <div className="w-full h-full pt-32 text-center">
+      <div className="w-full h-full pt-32 flex flex-col items-center justify-center gap-2">
+        <Disc3 className="w-10 h-10 text-ink-faint opacity-40" />
         <p className="font-serif italic text-lg text-ink-soft">That album wasn't found.</p>
-        <Link to="/albums" className="font-mono text-xs text-accent mt-2 inline-block">
+        <Link to="/albums" className="font-mono text-xs text-accent hover:underline mt-2">
           Return to Albums
         </Link>
       </div>
@@ -48,6 +50,8 @@ export default function Album() {
 
   const albumCard = toCard(album, 'album');
   const trackCards = (album.tracks || []).map(t => toCard(t, 'song'));
+
+  const totalDuration = trackCards.reduce((sum, t) => sum + (t.meta?.duration || 0), 0);
 
   const handlePlayAll = () => {
     if (trackCards.length > 0) {
@@ -58,44 +62,60 @@ export default function Album() {
 
   return (
     <div className="w-full h-full pt-20 pb-32 px-6 max-w-4xl mx-auto overflow-y-auto">
-      <Link
-        to="/albums"
-        className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-soft hover:text-ink mb-6"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        <span>All Albums</span>
-      </Link>
+      {/* Back link */}
+      <div className="page-enter">
+        <Link
+          to="/albums"
+          className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-faint hover:text-ink transition-colors duration-200 mb-8 group"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+          <span>All Albums</span>
+        </Link>
+      </div>
 
-      <div className="flex flex-col md:flex-row gap-8 items-start border-b border-rule pb-8 mb-8">
-        {/* Cover artwork */}
-        <div className="w-56 h-56 rounded-sm overflow-hidden border border-rule shadow-xl shrink-0">
+      {/* Album Hero */}
+      <div className="page-enter flex flex-col md:flex-row gap-8 items-start pb-8 mb-10">
+        {/* Cover artwork with shadow */}
+        <div className="w-56 h-56 rounded-lg overflow-hidden shrink-0 shadow-xl ring-1 ring-rule/20">
           <CardArt card={albumCard} className="w-full h-full" />
         </div>
 
         {/* Metadata & Actions */}
-        <div className="flex-1">
-          <span className="text-[10px] font-mono tracking-widest uppercase text-ink-soft bg-paper-2 px-2 py-0.5 rounded-xs border border-rule/50">
+        <div className="flex-1 page-enter-delayed">
+          <span className="stat-badge mb-3">
             ALBUM SLEEVE
           </span>
 
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-ink mt-2">
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-ink mt-2 tracking-tight">
             {album.title}
           </h1>
 
-          <p className="font-sans text-sm text-ink-soft mt-1">
+          <p className="font-sans text-sm text-ink-soft mt-2">
             By <span className="font-medium text-ink">{album.artist?.name || 'Artist'}</span>
             {album.releaseDate && ` · ${formatDate(album.releaseDate)}`}
           </p>
 
-          <p className="font-serif italic text-sm text-ink-soft mt-3 max-w-lg">
+          <p className="font-serif italic text-sm text-ink-soft mt-3 max-w-lg leading-relaxed">
             {album.description || 'Master recording preserved in the Laya archive.'}
           </p>
 
+          {/* Stats */}
+          <div className="flex items-center gap-3 mt-4">
+            <span className="stat-badge">
+              <Disc3 className="w-3 h-3" />
+              {trackCards.length} tracks
+            </span>
+            {totalDuration > 0 && (
+              <span className="stat-badge">
+                <Clock className="w-3 h-3" />
+                {formatTime(totalDuration)}
+              </span>
+            )}
+          </div>
+
+          {/* Actions */}
           <div className="flex items-center gap-3 mt-6">
-            <button
-              onClick={handlePlayAll}
-              className="px-4 py-2 bg-ink text-paper rounded-xs font-mono text-xs hover:bg-accent transition-colors flex items-center gap-2 cursor-pointer shadow-xs"
-            >
+            <button onClick={handlePlayAll} className="btn-primary">
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Play Record</span>
             </button>
@@ -104,7 +124,7 @@ export default function Album() {
                 queueCard(trackCards);
                 addToast(`Queued ${trackCards.length} tracks`, 'info');
               }}
-              className="px-4 py-2 bg-paper-2 border border-rule rounded-xs font-mono text-xs hover:border-accent transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="btn-secondary"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Queue All</span>
@@ -113,17 +133,21 @@ export default function Album() {
         </div>
       </div>
 
+      {/* Accent divider */}
+      <div className="accent-line mb-8" />
+
       {/* Ordered Track List */}
-      <div>
-        <h2 className="font-serif text-lg font-medium text-ink mb-4">
+      <div className="page-enter-delayed stagger-2">
+        <h2 className="section-header font-serif text-lg font-medium text-ink mb-5">
           Tracklist ({trackCards.length})
         </h2>
 
-        <div className="divide-y divide-rule/40 border border-rule/50 rounded-xs bg-paper-2/40">
+        <div className="rounded-lg border border-rule/40 overflow-hidden bg-paper-2/30">
           {trackCards.map((track, idx) => (
             <div
               key={track.id}
-              className="flex items-center justify-between p-3 hover:bg-paper-2 transition-colors group"
+              className={`track-row group ${idx < trackCards.length - 1 ? 'border-b border-rule/20' : ''}`}
+              style={{ margin: 0, borderRadius: 0 }}
             >
               <div
                 className="flex items-center gap-4 flex-1 cursor-pointer overflow-hidden"
@@ -132,16 +156,16 @@ export default function Album() {
                   playTrackDirect(track);
                 }}
               >
-                <span className="font-mono text-xs text-ink-faint w-5 text-right">
+                <span className="font-mono text-xs text-ink-faint w-6 text-right tabular-nums">
                   {idx + 1}
                 </span>
-                <span className="font-serif text-sm font-medium text-ink truncate group-hover:text-accent">
+                <span className="font-serif text-sm font-medium text-ink truncate group-hover:text-accent transition-colors">
                   {track.title}
                 </span>
               </div>
 
               <div className="flex items-center gap-4 pl-4">
-                <span className="font-mono text-xs text-ink-faint">
+                <span className="font-mono text-xs text-ink-faint tabular-nums">
                   {formatTime(track.meta?.duration)}
                 </span>
                 <button
@@ -149,7 +173,7 @@ export default function Album() {
                     queueCard(track);
                     addToast(`Queued "${track.title}"`, 'info');
                   }}
-                  className="text-ink-soft hover:text-ink text-xs font-mono p-1 cursor-pointer"
+                  className="text-ink-faint hover:text-accent text-[11px] font-mono p-1 cursor-pointer opacity-0 group-hover:opacity-100 transition-all duration-200"
                   title="Queue track"
                 >
                   + Queue

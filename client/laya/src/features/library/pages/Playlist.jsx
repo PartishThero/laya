@@ -9,7 +9,7 @@ import { useToast } from '@/app/providers/ToastContext.jsx';
 import { useAuth } from '@/features/auth/context/AuthContext.jsx';
 import { CardArt } from '@/components/cards/CardArt.jsx';
 import { formatTime } from '@/lib/time.js';
-import { Play, ArrowLeft, Trash2, Edit2, Loader2, ArrowUp, ArrowDown } from 'lucide-react';
+import { Play, ArrowLeft, Trash2, Edit2, Loader2, ArrowUp, ArrowDown, FolderOpen, Music, Clock } from 'lucide-react';
 
 export default function Playlist() {
   const { id } = useParams();
@@ -41,17 +41,19 @@ export default function Playlist() {
 
   if (loading) {
     return (
-      <div className="w-full h-full pt-32 flex items-center justify-center">
+      <div className="w-full h-full pt-32 flex flex-col items-center justify-center gap-3">
         <Loader2 className="w-6 h-6 text-accent animate-spin" />
+        <span className="text-xs font-mono text-ink-faint">Loading playlist…</span>
       </div>
     );
   }
 
   if (error || !playlist) {
     return (
-      <div className="w-full h-full pt-32 text-center">
+      <div className="w-full h-full pt-32 flex flex-col items-center justify-center gap-2">
+        <FolderOpen className="w-10 h-10 text-ink-faint opacity-40" />
         <p className="font-serif italic text-lg text-ink-soft">Playlist not found.</p>
-        <Link to="/playlists" className="font-mono text-xs text-accent mt-2 inline-block">
+        <Link to="/playlists" className="font-mono text-xs text-accent hover:underline mt-2">
           Return to Playlists
         </Link>
       </div>
@@ -65,6 +67,7 @@ export default function Playlist() {
 
   const playlistCard = toCard(playlist, 'playlist');
   const songCards = (playlist.songs || []).map(s => toCard(s, 'song'));
+  const totalDuration = songCards.reduce((sum, t) => sum + (t.meta?.duration || 0), 0);
 
   const handlePlayAll = () => {
     if (songCards.length > 0) {
@@ -123,21 +126,25 @@ export default function Playlist() {
 
   return (
     <div className="w-full h-full pt-20 pb-32 px-6 max-w-4xl mx-auto overflow-y-auto">
-      <Link
-        to="/playlists"
-        className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-soft hover:text-ink mb-6"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        <span>All Playlists</span>
-      </Link>
+      {/* Back link */}
+      <div className="page-enter">
+        <Link
+          to="/playlists"
+          className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-faint hover:text-ink transition-colors duration-200 mb-8 group"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+          <span>All Playlists</span>
+        </Link>
+      </div>
 
-      <div className="flex flex-col md:flex-row gap-8 items-start border-b border-rule pb-8 mb-8">
-        <div className="w-48 h-48 rounded-sm overflow-hidden border border-rule shadow-xl shrink-0">
+      {/* Playlist Hero */}
+      <div className="page-enter flex flex-col md:flex-row gap-8 items-start pb-8 mb-10">
+        <div className="w-48 h-48 rounded-lg overflow-hidden shrink-0 shadow-xl ring-1 ring-rule/20">
           <CardArt card={playlistCard} className="w-full h-full" />
         </div>
 
-        <div className="flex-1">
-          <span className="text-[10px] font-mono tracking-widest uppercase text-ink-soft bg-paper-2 px-2 py-0.5 rounded-xs border border-rule/50">
+        <div className="flex-1 page-enter-delayed">
+          <span className="stat-badge mb-3">
             PLAYLIST FOLDER
           </span>
 
@@ -147,32 +154,27 @@ export default function Playlist() {
                 type="text"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
-                className="font-serif text-2xl font-bold px-2 py-1 bg-paper-2 border border-accent rounded-xs outline-none"
+                className="input-premium !text-2xl font-serif font-bold !py-1.5"
                 autoFocus
               />
-              <button
-                type="submit"
-                className="text-xs font-mono px-3 py-1.5 bg-ink text-paper rounded-xs"
-              >
-                Save
-              </button>
+              <button type="submit" className="btn-primary !py-1.5 !px-3">Save</button>
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="text-xs font-mono text-ink-soft px-2 py-1"
+                className="text-xs font-mono text-ink-soft px-2 py-1 hover:text-ink cursor-pointer"
               >
                 Cancel
               </button>
             </form>
           ) : (
             <div className="flex items-center gap-3 mt-2">
-              <h1 className="font-serif text-3xl md:text-4xl font-bold text-ink">
+              <h1 className="font-serif text-3xl md:text-4xl font-bold text-ink tracking-tight">
                 {playlist.name}
               </h1>
               {isOwner && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="p-1 text-ink-soft hover:text-accent cursor-pointer"
+                  className="p-1.5 text-ink-faint hover:text-accent hover:bg-accent-soft rounded-md cursor-pointer transition-all duration-200"
                   title="Rename playlist"
                 >
                   <Edit2 className="w-4 h-4" />
@@ -181,20 +183,34 @@ export default function Playlist() {
             </div>
           )}
 
-          <p className="font-sans text-sm text-ink-soft mt-1">
+          <p className="font-sans text-sm text-ink-soft mt-2">
             Curated by <span className="font-medium text-ink">{playlist.owner?.displayName || playlist.owner?.username || 'Archivist'}</span>
-            {` · ${songCards.length} ${songCards.length === 1 ? 'record' : 'records'}`}
           </p>
 
-          <p className="font-serif italic text-sm text-ink-soft mt-3 max-w-lg">
+          <p className="font-serif italic text-sm text-ink-soft mt-3 max-w-lg leading-relaxed">
             {playlist.description || 'A hand-selected shelf preserved in the collection.'}
           </p>
 
+          {/* Stats */}
+          <div className="flex items-center gap-3 mt-4">
+            <span className="stat-badge">
+              <Music className="w-3 h-3" />
+              {songCards.length} {songCards.length === 1 ? 'record' : 'records'}
+            </span>
+            {totalDuration > 0 && (
+              <span className="stat-badge">
+                <Clock className="w-3 h-3" />
+                {formatTime(totalDuration)}
+              </span>
+            )}
+          </div>
+
+          {/* Actions */}
           <div className="flex items-center gap-3 mt-6">
             <button
               onClick={handlePlayAll}
               disabled={songCards.length === 0}
-              className="px-4 py-2 bg-ink text-paper rounded-xs font-mono text-xs hover:bg-accent transition-colors flex items-center gap-2 cursor-pointer shadow-xs disabled:opacity-40"
+              className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:bg-ink"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Play Playlist</span>
@@ -203,7 +219,7 @@ export default function Playlist() {
             {isOwner && (
               <button
                 onClick={handleDelete}
-                className="px-3 py-2 bg-paper-2 border border-rule hover:border-danger hover:text-danger rounded-xs font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="btn-secondary !border-rule hover:!border-danger hover:!text-danger"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Delete</span>
@@ -213,27 +229,32 @@ export default function Playlist() {
         </div>
       </div>
 
+      {/* Accent divider */}
+      <div className="accent-line mb-8" />
+
       {/* Tracks */}
-      <div>
-        <h2 className="font-serif text-lg font-medium text-ink mb-4">
+      <div className="page-enter-delayed stagger-2">
+        <h2 className="section-header font-serif text-lg font-medium text-ink mb-5">
           Recorded Tracks ({songCards.length})
         </h2>
 
         {songCards.length === 0 ? (
-          <div className="py-16 text-center border border-dashed border-rule/60 rounded-xs">
+          <div className="empty-state border border-dashed border-rule/40 rounded-lg">
+            <FolderOpen className="empty-state-icon" />
             <p className="font-serif italic text-ink-soft">
               This playlist is currently empty.
             </p>
-            <p className="text-xs font-mono text-ink-faint mt-1">
+            <p className="text-xs font-mono text-ink-faint mt-1.5 max-w-xs">
               Drag cards from the canvas directly onto this playlist dock to add them.
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-rule/40 border border-rule/50 rounded-xs bg-paper-2/40">
+          <div className="rounded-lg border border-rule/40 overflow-hidden bg-paper-2/30">
             {songCards.map((track, idx) => (
               <div
                 key={track.id || idx}
-                className="flex items-center justify-between p-3 hover:bg-paper-2 transition-colors group"
+                className={`track-row group ${idx < songCards.length - 1 ? 'border-b border-rule/20' : ''}`}
+                style={{ margin: 0, borderRadius: 0 }}
               >
                 <div
                   className="flex items-center gap-4 flex-1 cursor-pointer overflow-hidden"
@@ -242,17 +263,17 @@ export default function Playlist() {
                     playTrackDirect(track);
                   }}
                 >
-                  <span className="font-mono text-xs text-ink-faint w-5 text-right">
+                  <span className="font-mono text-xs text-ink-faint w-6 text-right tabular-nums">
                     {idx + 1}
                   </span>
-                  <div className="w-8 h-8 rounded-xs overflow-hidden shrink-0 border border-rule/30">
+                  <div className="w-9 h-9 rounded-md overflow-hidden shrink-0 border border-rule/20 shadow-sm">
                     <CardArt card={track} className="w-full h-full" />
                   </div>
                   <div className="overflow-hidden">
-                    <p className="font-serif text-sm font-medium text-ink truncate group-hover:text-accent">
+                    <p className="font-serif text-sm font-medium text-ink truncate group-hover:text-accent transition-colors">
                       {track.title}
                     </p>
-                    <p className="font-sans text-xs text-ink-soft truncate">
+                    <p className="font-sans text-xs text-ink-faint truncate">
                       {track.subtitle}
                     </p>
                   </div>
@@ -260,18 +281,18 @@ export default function Playlist() {
 
                 <div className="flex items-center gap-3 pl-4">
                   {track.meta?.duration > 0 && (
-                    <span className="font-mono text-xs text-ink-faint">
+                    <span className="font-mono text-xs text-ink-faint tabular-nums">
                       {formatTime(track.meta.duration)}
                     </span>
                   )}
 
                   {/* Reorder up/down for owner */}
                   {isOwner && (
-                    <div className="flex items-center gap-0.5">
+                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <button
                         onClick={() => handleMoveTrack(idx, idx - 1)}
                         disabled={idx === 0}
-                        className="p-1 text-ink-soft hover:text-ink disabled:opacity-20 cursor-pointer"
+                        className="p-1 text-ink-faint hover:text-ink disabled:opacity-20 cursor-pointer rounded-md hover:bg-paper-2"
                         title="Move track up"
                       >
                         <ArrowUp className="w-3.5 h-3.5" />
@@ -279,7 +300,7 @@ export default function Playlist() {
                       <button
                         onClick={() => handleMoveTrack(idx, idx + 1)}
                         disabled={idx === songCards.length - 1}
-                        className="p-1 text-ink-soft hover:text-ink disabled:opacity-20 cursor-pointer"
+                        className="p-1 text-ink-faint hover:text-ink disabled:opacity-20 cursor-pointer rounded-md hover:bg-paper-2"
                         title="Move track down"
                       >
                         <ArrowDown className="w-3.5 h-3.5" />
@@ -290,7 +311,7 @@ export default function Playlist() {
                   {isOwner && (
                     <button
                       onClick={() => handleRemoveTrack(track.entityId)}
-                      className="p-1 text-ink-soft hover:text-danger cursor-pointer ml-1"
+                      className="p-1 text-ink-faint hover:text-danger cursor-pointer rounded-md hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all duration-200"
                       title="Remove from playlist"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

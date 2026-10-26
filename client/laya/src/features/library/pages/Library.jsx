@@ -8,7 +8,7 @@ import { toCard } from '@/models/card.model.js';
 import { Card } from '@/components/cards/Card.jsx';
 import { usePlayer } from '@/features/player/context/PlayerContext.jsx';
 import { Link } from 'react-router-dom';
-import { BookMarked, Heart, History, Plus } from 'lucide-react';
+import { BookMarked, Heart, History, FolderOpen, Music } from 'lucide-react';
 
 export default function Library() {
   const { user, isAuthenticated } = useAuth();
@@ -41,78 +41,82 @@ export default function Library() {
 
   if (!isAuthenticated) {
     return (
-      <div className="w-full h-full pt-28 pb-32 px-6 flex flex-col items-center justify-center text-center">
-        <BookMarked className="w-12 h-12 text-ink-soft mb-3 opacity-60" />
-        <h1 className="font-serif italic text-2xl text-ink">
+      <div className="w-full h-full pt-28 pb-32 px-6 flex flex-col items-center justify-center text-center page-enter">
+        <div className="w-16 h-16 rounded-2xl bg-paper-2 border border-rule/40 flex items-center justify-center mb-5">
+          <BookMarked className="w-8 h-8 text-ink-faint opacity-50" />
+        </div>
+        <h1 className="font-serif italic text-3xl text-ink tracking-tight">
           Your personal archive
         </h1>
-        <p className="text-xs font-mono text-ink-soft max-w-sm mt-1 mb-6">
+        <p className="text-xs font-mono text-ink-soft max-w-sm mt-2 mb-8 leading-relaxed">
           Sign in to keep records, save playlists, and review your listening history.
         </p>
-        <Link
-          to="/login"
-          className="px-6 py-2 bg-ink text-paper font-mono text-xs rounded-sm hover:bg-accent transition-colors"
-        >
-          Sign In
+        <Link to="/login" className="btn-primary">
+          Sign In to Continue
         </Link>
       </div>
     );
   }
 
+  const tabs = [
+    { key: 'playlists', label: 'Playlists', count: playlists.length, icon: BookMarked },
+    { key: 'likes', label: 'Liked Songs', count: likes.length, icon: Heart },
+    { key: 'history', label: 'History', count: null, icon: History }
+  ];
+
   return (
     <div className="w-full h-full pt-20 pb-32 px-6 max-w-6xl mx-auto overflow-y-auto">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-rule pb-4 mb-6 gap-4">
-        <div>
-          <h1 className="font-serif italic text-3xl text-ink">
-            {user.displayName || user.username}'s Library
-          </h1>
-          <p className="text-xs font-mono text-ink-soft mt-1">
-            Personal shelves, kept records, and listening trails.
-          </p>
-        </div>
+      <div className="page-enter pb-6 mb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="accent-line mb-4" />
+            <h1 className="font-serif italic text-3xl md:text-4xl text-ink tracking-tight">
+              {user.displayName || user.username}'s Library
+            </h1>
+            <p className="text-xs font-mono text-ink-faint mt-1.5">
+              Personal shelves, kept records, and listening trails.
+            </p>
+          </div>
 
-        {/* Tab switchers */}
-        <div className="flex items-center gap-2 font-mono text-xs">
-          <button
-            onClick={() => setTab('playlists')}
-            className={`px-3 py-1.5 rounded-xs transition-colors cursor-pointer flex items-center gap-1.5 ${
-              tab === 'playlists' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'
-            }`}
-          >
-            <BookMarked className="w-3.5 h-3.5" />
-            <span>Playlists ({playlists.length})</span>
-          </button>
-          <button
-            onClick={() => setTab('likes')}
-            className={`px-3 py-1.5 rounded-xs transition-colors cursor-pointer flex items-center gap-1.5 ${
-              tab === 'likes' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'
-            }`}
-          >
-            <Heart className="w-3.5 h-3.5" />
-            <span>Liked Songs ({likes.length})</span>
-          </button>
-          <button
-            onClick={() => setTab('history')}
-            className={`px-3 py-1.5 rounded-xs transition-colors cursor-pointer flex items-center gap-1.5 ${
-              tab === 'history' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'
-            }`}
-          >
-            <History className="w-3.5 h-3.5" />
-            <span>History</span>
-          </button>
+          {/* Tab switchers */}
+          <div className="flex items-center gap-1 p-1 bg-paper-2/60 rounded-lg border border-rule/30">
+            {tabs.map(t => {
+              const Icon = t.icon;
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key)}
+                  className={`px-3.5 py-2 rounded-md transition-all duration-200 cursor-pointer flex items-center gap-1.5 text-[11px] font-mono ${
+                    tab === t.key
+                      ? 'bg-ink text-paper shadow-sm'
+                      : 'text-ink-soft hover:text-ink hover:bg-paper/60'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{t.label}</span>
+                  {t.count !== null && (
+                    <span className={`text-[9px] ${tab === t.key ? 'text-paper/70' : 'text-ink-faint'}`}>
+                      {t.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
       {/* TAB CONTENT: PLAYLISTS */}
       {tab === 'playlists' && (
-        <div>
+        <div className="page-enter-delayed">
           {playlists.length === 0 ? (
-            <div className="py-20 text-center">
+            <div className="empty-state">
+              <FolderOpen className="empty-state-icon" />
               <p className="font-serif italic text-lg text-ink-soft">
                 Nothing kept yet. Go wander.
               </p>
-              <p className="text-xs font-mono text-ink-faint mt-1">
+              <p className="text-xs font-mono text-ink-faint mt-1.5 max-w-xs">
                 Drag cards onto the playlist dock to start your personal archive.
               </p>
             </div>
@@ -136,11 +140,15 @@ export default function Library() {
 
       {/* TAB CONTENT: LIKES */}
       {tab === 'likes' && (
-        <div>
+        <div className="page-enter-delayed">
           {likes.length === 0 ? (
-            <div className="py-20 text-center">
+            <div className="empty-state">
+              <Heart className="empty-state-icon" />
               <p className="font-serif italic text-lg text-ink-soft">
                 No songs saved yet.
+              </p>
+              <p className="text-xs font-mono text-ink-faint mt-1.5">
+                Like songs while listening to save them here.
               </p>
             </div>
           ) : (
@@ -160,9 +168,10 @@ export default function Library() {
 
       {/* TAB CONTENT: HISTORY */}
       {tab === 'history' && (
-        <div>
+        <div className="page-enter-delayed">
           {history.length === 0 ? (
-            <div className="py-20 text-center">
+            <div className="empty-state">
+              <History className="empty-state-icon" />
               <p className="font-serif italic text-lg text-ink-soft">
                 No records played yet in this session.
               </p>

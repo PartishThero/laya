@@ -25,7 +25,7 @@ if (!mongoUri) {
 
 const seed = async () => {
   try {
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(mongoUri, { family: 4 });
     console.log('✅ Connected to MongoDB for rich catalogue seeding');
 
     // 1. Seed Recording Artists
