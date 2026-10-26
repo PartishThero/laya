@@ -19,25 +19,13 @@ try {
   console.warn('Could not initialize upload directories:', err.message);
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const targetDir = file.fieldname === 'coverFile' ? coversDir : audioDir;
-    try {
-      if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
-    } catch (_) {}
-    cb(null, targetDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname) || '';
-    const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_').slice(0, 30);
-    cb(null, `${file.fieldname}-${uniqueSuffix}-${safeName}${ext}`);
-  }
-});
+// Use memoryStorage for serverless environments so audio buffers can be written
+// directly to MongoDB GridFS and cover images can be encoded as Base64 data URIs
+const storage = multer.memoryStorage();
 
 export const uploadSongMedia = multer({
   storage,
   limits: {
-    fileSize: 80 * 1024 * 1024 // 80 MB limit for high-res audio
+    fileSize: 80 * 1024 * 1024 // 80 MB limit for audio
   }
 });
