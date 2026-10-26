@@ -13,10 +13,11 @@ import userRoutes from './routes/userRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
 import { getDiscovery } from './controllers/searchController.js';
 import path from 'path';
+import fs from 'fs';
+import os from 'os';
 import errorMiddleware from './middleware/errorMiddleware.js';
 
 dotenv.config();
-connectDB();
 
 const app = express();
 
@@ -48,16 +49,32 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Static file hosting for user-uploaded audio and cover artwork
-app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
+const localUploads = path.resolve(process.cwd(), 'uploads');
+const tmpUploads = path.join(os.tmpdir(), 'uploads');
+const uploadsDir = fs.existsSync(localUploads) ? localUploads : tmpUploads;
+app.use('/uploads', express.static(uploadsDir));
 
 // Only log failed requests (>= 400) to keep server console clean, unless DEBUG_HTTP=true
 app.use(morgan('dev', {
   skip: (req, res) => !process.env.DEBUG_HTTP && res.statusCode < 400
 }));
 
-// Health check
+// Health check (does not require database connection)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
+
+// Middleware to ensure database connection before executing queries
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    return res.status(500).json({
+      error: 'Database connection failed',
+      message: err.message
+    });
+  }
 });
 
 // Primary REST routes

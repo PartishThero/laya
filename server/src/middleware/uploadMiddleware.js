@@ -2,20 +2,30 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 
-const audioDir = path.resolve(process.cwd(), 'uploads/audio');
-const coversDir = path.resolve(process.cwd(), 'uploads/covers');
+// On Vercel / serverless, use the writable /tmp directory to avoid EROFS crashes
+const uploadBase = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'uploads')
+  : path.resolve(process.cwd(), 'uploads');
 
-if (!fs.existsSync(audioDir)) fs.mkdirSync(audioDir, { recursive: true });
-if (!fs.existsSync(coversDir)) fs.mkdirSync(coversDir, { recursive: true });
+const audioDir = path.join(uploadBase, 'audio');
+const coversDir = path.join(uploadBase, 'covers');
+
+try {
+  if (!fs.existsSync(audioDir)) fs.mkdirSync(audioDir, { recursive: true });
+  if (!fs.existsSync(coversDir)) fs.mkdirSync(coversDir, { recursive: true });
+} catch (err) {
+  console.warn('Could not initialize upload directories:', err.message);
+}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    if (file.fieldname === 'coverFile') {
-      cb(null, coversDir);
-    } else {
-      cb(null, audioDir);
-    }
+    const targetDir = file.fieldname === 'coverFile' ? coversDir : audioDir;
+    try {
+      if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+    } catch (_) {}
+    cb(null, targetDir);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
