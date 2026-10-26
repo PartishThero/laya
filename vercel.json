@@ -4,6 +4,12 @@
     "laya": {
       "root": "client/laya",
       "framework": "vite",
+      "rewrites": [
+        {
+          "source": "/(.*)",
+          "destination": "/index.html"
+        }
+      ],
       "bindings": [
         {
           "type": "service",
@@ -39,17 +45,9 @@
       }
     },
     {
-      "source": "/assets/(.*)",
-      "destination": {
-        "service": "laya",
-        "path": "/assets/$1"
-      }
-    },
-    {
       "source": "/(.*)",
       "destination": {
-        "service": "laya",
-        "path": "/"
+        "service": "laya"
       }
     }
   ]
