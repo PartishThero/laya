@@ -4,15 +4,13 @@ import {
   getSong,
   createSong,
   deleteSong,
-  streamSong,
-  streamAudioById
+  streamSong
 } from '../controllers/songController.js';
 import { uploadSongMedia } from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
 router.get('/', getSongs);
-router.get('/audio/:fileId', streamAudioById);
 router.get('/:id', getSong);
 router.get('/:id/stream', streamSong);
 router.post(
