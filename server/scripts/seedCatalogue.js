@@ -1,5 +1,5 @@
 // scripts/seedCatalogue.js
-// Seeds the database with curated R&B, Soul, and Indie tracks matching the user's Spotify playlist
+// Seeds the database with rich, royalty-free analog tracks, albums, artists, and playlists
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -25,70 +25,34 @@ if (!mongoUri) {
 
 const seed = async () => {
   try {
-    await mongoose.connect(mongoUri);
-    console.log('✅ Connected to MongoDB for Spotify-inspired catalogue seeding');
+    await mongoose.connect(mongoUri, { family: 4 });
+    console.log('✅ Connected to MongoDB for rich catalogue seeding');
 
-    // 1. Seed Artists
+    // 1. Seed Recording Artists
     const artistsData = [
       {
-        name: 'PARTYNEXTDOOR',
-        bio: 'Canadian singer, songwriter, and producer known for moody nocturnal R&B, atmospheric synths, and melodic hooks.',
-        imageUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600&auto=format&fit=crop&q=80',
-        genres: ['Contemporary R&B', 'Hip Hop', 'Trap']
+        name: 'Aether Sounds',
+        bio: 'Ambient and electronic soundscapes designed for focus, analog clarity, and calm.',
+        imageUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80',
+        genres: ['Ambient', 'Electronic', 'Downtempo']
       },
       {
-        name: 'Bryson Tiller',
-        bio: 'Singer and rapper who pioneered the "TrapSoul" aesthetic, blending melodic 90s R&B with 808 trap percussion.',
-        imageUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80',
-        genres: ['TrapSoul', 'Contemporary R&B']
+        name: 'Luna Horizon',
+        bio: 'Lo-fi chill beats and organic acoustic textures recorded to tape.',
+        imageUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&auto=format&fit=crop&q=80',
+        genres: ['Lo-Fi', 'Chillhop', 'Acoustic']
       },
       {
-        name: 'Brent Faiyaz',
-        bio: 'Grammy-nominated American singer and lead vocalist of Sonder, celebrated for his warm falsetto and introspective lyrics.',
-        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-        genres: ['R&B', 'Neo-Soul', 'Alternative R&B']
+        name: 'Canyon Reverie',
+        bio: 'Warm acoustic fingerpicking and delicate folk arrangements recorded in cabin isolation.',
+        imageUrl: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=500&auto=format&fit=crop&q=80',
+        genres: ['Indie Folk', 'Acoustic', 'Fingerstyle']
       },
       {
-        name: 'Frank Ocean',
-        bio: 'Visionary singer-songwriter renowned for his idiosyncratic musical style, avant-garde introspection, and elliptical lyrics.',
-        imageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&auto=format&fit=crop&q=80',
-        genres: ['Neo-Soul', 'Alternative R&B', 'Psychedelic Pop']
-      },
-      {
-        name: 'Kehlani',
-        bio: 'American singer and dancer with honeyed vocals, candid storytelling, and lush contemporary West Coast R&B arrangements.',
-        imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
-        genres: ['Contemporary R&B', 'Pop', 'Soul']
-      },
-      {
-        name: 'Childish Gambino',
-        bio: 'Multi-hyphenate artist Donald Glover delivering funk, psychedelic soul, and nostalgic analogue arrangements.',
-        imageUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&auto=format&fit=crop&q=80',
-        genres: ['Psychedelic Soul', 'Funk', 'R&B']
-      },
-      {
-        name: 'Jhené Aiko',
-        bio: 'Californian singer-songwriter recognized for gentle, ethereal acoustic-R&B phrasing and crystal singing bowl harmonies.',
-        imageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&auto=format&fit=crop&q=80',
-        genres: ['Alternative R&B', 'Neo-Soul']
-      },
-      {
-        name: 'BROCKHAMPTON',
-        bio: 'Trailblazing American alternative hip-hop collective fusing melodic hooks, eclectic beats, and analog texture.',
-        imageUrl: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=600&auto=format&fit=crop&q=80',
-        genres: ['Alternative Hip Hop', 'Indie Pop']
-      },
-      {
-        name: 'Keyshia Cole',
-        bio: 'Platinum-selling soul vocalist revered for raw, powerhouse vocals and classic 2000s R&B storytelling.',
-        imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80',
-        genres: ['Soul', 'R&B']
-      },
-      {
-        name: 'Jeff Buckley',
-        bio: 'Iconic American vocalist and guitarist praised for his sweeping multi-octave range and intimate analog recordings.',
-        imageUrl: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=600&auto=format&fit=crop&q=80',
-        genres: ['Alternative Rock', 'Folk Rock', 'Soul']
+        name: 'Velvet Echo',
+        bio: 'Dusk neo-soul chords, vintage Rhodes electric piano, and mellow tape grooves.',
+        imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&auto=format&fit=crop&q=80',
+        genres: ['Neo-Soul', 'Jazz', 'Downtempo']
       }
     ];
 
@@ -109,60 +73,32 @@ const seed = async () => {
     // 2. Seed Albums
     const albumsData = [
       {
-        title: 'PARTYNEXTDOOR TWO',
+        title: 'Morning Reflections',
         artist: savedArtists[0]._id,
-        coverUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80',
-        description: 'Nocturnal ambient R&B and filtered 808s from Toronto.',
-        releaseDate: new Date('2014-07-29')
+        coverUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80',
+        description: 'Atmospheric warmth and delicate synthesis for early mornings.',
+        releaseDate: new Date('2024-01-15')
       },
       {
-        title: 'T.R.A.P.S.O.U.L',
+        title: 'Midnight Coffee',
         artist: savedArtists[1]._id,
-        coverUrl: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&auto=format&fit=crop&q=80',
-        description: 'The definitive debut merging slow-tempo trap grooves with classic soul crooning.',
-        releaseDate: new Date('2015-10-02')
+        coverUrl: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=500&auto=format&fit=crop&q=80',
+        description: 'Late night lo-fi grooves for night owls and quiet readers.',
+        releaseDate: new Date('2024-02-20')
       },
       {
-        title: 'Larger Than Life',
+        title: 'Canyon Pines',
         artist: savedArtists[2]._id,
-        coverUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-        description: 'Warm tape saturation, 2000s R&B samples, and seamless vocal harmonies.',
-        releaseDate: new Date('2023-10-27')
+        coverUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=500&auto=format&fit=crop&q=80',
+        description: 'Analog acoustic guitar recorded in intimate cabin isolation.',
+        releaseDate: new Date('2024-03-10')
       },
       {
-        title: 'channel ORANGE',
+        title: 'Slow Twilight',
         artist: savedArtists[3]._id,
-        coverUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80',
-        description: 'Grammy-winning masterwork exploring love, summer haze, and analog warmth.',
-        releaseDate: new Date('2012-07-10')
-      },
-      {
-        title: 'Folded',
-        artist: savedArtists[4]._id,
-        coverUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
-        description: 'Silky, intimate vocals and candid acoustic ballads.',
-        releaseDate: new Date('2024-04-12')
-      },
-      {
-        title: '"Awaken, My Love!"',
-        artist: savedArtists[5]._id,
-        coverUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&auto=format&fit=crop&q=80',
-        description: 'Psychedelic soul, heavy wah guitars, and 1970s Parliament-Funkadelic inspiration.',
-        releaseDate: new Date('2016-12-02')
-      },
-      {
-        title: 'Trip',
-        artist: savedArtists[6]._id,
-        coverUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&auto=format&fit=crop&q=80',
-        description: 'An acoustic-psychedelic journey through grief, love, and healing.',
-        releaseDate: new Date('2017-09-22')
-      },
-      {
-        title: 'SATURATION II',
-        artist: savedArtists[7]._id,
-        coverUrl: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=600&auto=format&fit=crop&q=80',
-        description: 'Eclectic boyband hip-hop full of hooks, infectious acoustic strums, and energy.',
-        releaseDate: new Date('2017-08-25')
+        coverUrl: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=500&auto=format&fit=crop&q=80',
+        description: 'Mellow electric piano and gentle drums for the evening blue hour.',
+        releaseDate: new Date('2024-04-05')
       }
     ];
 
@@ -174,169 +110,162 @@ const seed = async () => {
       } else {
         album.coverUrl = alb.coverUrl;
         album.description = alb.description;
-        album.releaseDate = alb.releaseDate;
         await album.save();
       }
       savedAlbums.push(album);
     }
 
-    // 3. Seed Songs with verified high-speed MP3 audio streams
+    // 3. Seed Songs with open-source audio streams
     const songsData = [
+      // Album 1 (Aether Sounds - Morning Reflections)
       {
-        title: 'Belong to the City',
+        title: 'Cascade of Light',
         artist: savedArtists[0]._id,
         album: savedAlbums[0]._id,
-        duration: 98,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80',
-        genre: 'R&B / Soul',
+        coverUrl: savedAlbums[0].coverUrl,
+        duration: 372,
+        genre: 'Ambient',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
         isPublished: true
       },
       {
-        title: 'TBH',
+        title: 'Drifting Petals',
         artist: savedArtists[0]._id,
         album: savedAlbums[0]._id,
-        duration: 125,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80',
-        genre: 'R&B / Soul',
+        coverUrl: savedAlbums[0].coverUrl,
+        duration: 423,
+        genre: 'Ambient',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
         isPublished: true
       },
       {
-        title: "Don't",
+        title: 'Still Horizon',
+        artist: savedArtists[0]._id,
+        album: savedAlbums[0]._id,
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+        coverUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500&auto=format&fit=crop&q=80',
+        duration: 310,
+        genre: 'Ambient',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
+        isPublished: true
+      },
+
+      // Album 2 (Luna Horizon - Midnight Coffee)
+      {
+        title: 'Rain on the Rooftop',
         artist: savedArtists[1]._id,
         album: savedAlbums[1]._id,
-        duration: 198,
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&auto=format&fit=crop&q=80',
-        genre: 'TrapSoul',
-        isPublished: true
-      },
-      {
-        title: 'Best Time',
-        artist: savedArtists[2]._id,
-        album: savedAlbums[2]._id,
-        duration: 102,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-        genre: 'R&B / Soul',
+        coverUrl: savedAlbums[1].coverUrl,
+        duration: 345,
+        genre: 'Lo-Fi',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
         isPublished: true
       },
       {
-        title: 'Trust',
-        artist: savedArtists[2]._id,
-        album: savedAlbums[2]._id,
-        duration: 158,
+        title: 'Corner Table Reverie',
+        artist: savedArtists[1]._id,
+        album: savedAlbums[1]._id,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-        genre: 'R&B / Soul',
+        coverUrl: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?w=500&auto=format&fit=crop&q=80',
+        duration: 290,
+        genre: 'Lo-Fi',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
         isPublished: true
       },
       {
-        title: 'Paper Soldier (feat. Joony)',
+        title: 'Steam & Cinnamon',
+        artist: savedArtists[1]._id,
+        album: savedAlbums[1]._id,
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+        coverUrl: savedAlbums[1].coverUrl,
+        duration: 315,
+        genre: 'Lo-Fi',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
+        isPublished: true
+      },
+
+      // Album 3 (Canyon Reverie - Canyon Pines)
+      {
+        title: 'Pines in Morning Mist',
         artist: savedArtists[2]._id,
         album: savedAlbums[2]._id,
-        duration: 232,
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-        genre: 'R&B / Soul',
-        isPublished: true
-      },
-      {
-        title: 'Bad Religion',
-        artist: savedArtists[3]._id,
-        album: savedAlbums[3]._id,
-        duration: 175,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80',
-        genre: 'Neo-Soul',
+        coverUrl: savedAlbums[2].coverUrl,
+        duration: 275,
+        genre: 'Indie Folk',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
         isPublished: true
       },
       {
-        title: 'Pink Matter (feat. André 3000)',
+        title: 'Wooden Porch Steps',
+        artist: savedArtists[2]._id,
+        album: savedAlbums[2]._id,
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+        coverUrl: 'https://images.unsplash.com/photo-1510784722466-f2aa9c52fff6?w=500&auto=format&fit=crop&q=80',
+        duration: 330,
+        genre: 'Indie Folk',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
+        isPublished: true
+      },
+      {
+        title: 'Fading Ember',
+        artist: savedArtists[2]._id,
+        album: savedAlbums[2]._id,
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3',
+        coverUrl: savedAlbums[2].coverUrl,
+        duration: 298,
+        genre: 'Indie Folk',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
+        isPublished: true
+      },
+
+      // Album 4 (Velvet Echo - Slow Twilight)
+      {
+        title: 'Blue Hour Velvet',
         artist: savedArtists[3]._id,
         album: savedAlbums[3]._id,
-        duration: 268,
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80',
-        genre: 'Neo-Soul',
-        isPublished: true
-      },
-      {
-        title: 'Folded',
-        artist: savedArtists[4]._id,
-        album: savedAlbums[4]._id,
-        duration: 188,
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
-        genre: 'Contemporary R&B',
-        isPublished: true
-      },
-      {
-        title: 'back of the club',
-        artist: savedArtists[4]._id,
-        album: savedAlbums[4]._id,
-        duration: 275,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
-        genre: 'Contemporary R&B',
+        coverUrl: savedAlbums[3].coverUrl,
+        duration: 360,
+        genre: 'Neo-Soul',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
         isPublished: true
       },
       {
-        title: 'Redbone',
-        artist: savedArtists[5]._id,
-        album: savedAlbums[5]._id,
-        duration: 326,
+        title: 'Amber Streetlights',
+        artist: savedArtists[3]._id,
+        album: savedAlbums[3]._id,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&auto=format&fit=crop&q=80',
-        genre: 'Psychedelic Soul',
+        coverUrl: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=500&auto=format&fit=crop&q=80',
+        duration: 340,
+        genre: 'Neo-Soul',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
         isPublished: true
       },
       {
-        title: 'Sativa (feat. Swae Lee)',
-        artist: savedArtists[6]._id,
-        album: savedAlbums[6]._id,
-        duration: 278,
+        title: 'Warm Analog Tape',
+        artist: savedArtists[3]._id,
+        album: savedAlbums[3]._id,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&auto=format&fit=crop&q=80',
-        genre: 'Alternative R&B',
-        isPublished: true
-      },
-      {
-        title: 'Sweet',
-        artist: savedArtists[7]._id,
-        album: savedAlbums[7]._id,
-        duration: 270,
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=600&auto=format&fit=crop&q=80',
-        genre: 'Alternative Hip Hop',
-        isPublished: true
-      },
-      {
-        title: 'Love',
-        artist: savedArtists[8]._id,
-        duration: 255,
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80',
-        genre: 'Soul / R&B',
-        isPublished: true
-      },
-      {
-        title: 'Everybody Here Wants You',
-        artist: savedArtists[9]._id,
-        duration: 287,
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=600&auto=format&fit=crop&q=80',
-        genre: 'Alternative Rock / Soul',
-        isPublished: true
-      },
-      {
-        title: 'One Night Only',
-        artist: savedArtists[2]._id,
-        duration: 195,
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3',
-        coverUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-        genre: 'R&B / Soul',
+        coverUrl: savedAlbums[3].coverUrl,
+        duration: 388,
+        genre: 'Neo-Soul',
+        licence: 'CC BY 4.0',
+        attribution: 'SoundHelix Open Audio',
         isPublished: true
       }
     ];
@@ -357,7 +286,14 @@ const seed = async () => {
       savedSongs.push(song);
     }
 
-    // 4. Ensure demo curator exists
+    // 4. Link album tracks
+    for (let i = 0; i < savedAlbums.length; i++) {
+      const albSongs = savedSongs.filter(s => s.album.toString() === savedAlbums[i]._id.toString());
+      savedAlbums[i].tracks = albSongs.map(s => s._id);
+      await savedAlbums[i].save();
+    }
+
+    // 5. Ensure a demo curator user exists
     let demoUser = await User.findOne({ username: 'curator' });
     if (!demoUser) {
       const passwordHash = await bcrypt.hash('curator1234', 10);
@@ -365,28 +301,28 @@ const seed = async () => {
         username: 'curator',
         email: 'curator@laya.fm',
         passwordHash,
-        displayName: 'Laya Curator',
+        displayName: 'Laya Archive',
         avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'
       });
     }
 
-    // 5. Seed "Liked Songs" and "Late Night R&B" playlists
+    // 6. Seed Public Playlists
     const playlistsData = [
       {
-        name: 'Liked Songs',
-        description: 'Curated favorites matching your personal Spotify library.',
+        name: 'Late Night Library',
+        description: 'Analog and warm recordings for uninterrupted focus and nocturnal reading.',
         owner: demoUser._id,
         isPublic: true,
-        coverUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-        songs: savedSongs.map(s => s._id)
+        coverUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=500&auto=format&fit=crop&q=80',
+        songs: [savedSongs[0]._id, savedSongs[3]._id, savedSongs[6]._id, savedSongs[9]._id]
       },
       {
-        name: 'Late Night R&B & Soul',
-        description: 'Smooth, late-night atmospheric records for analog listening.',
+        name: 'Sunday Morning Coffee',
+        description: 'Gentle acoustic warmth and quiet ambient drifting.',
         owner: demoUser._id,
         isPublic: true,
-        coverUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80',
-        songs: [savedSongs[0]._id, savedSongs[2]._id, savedSongs[3]._id, savedSongs[6]._id, savedSongs[10]._id]
+        coverUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&auto=format&fit=crop&q=80',
+        songs: [savedSongs[1]._id, savedSongs[4]._id, savedSongs[7]._id, savedSongs[10]._id]
       }
     ];
 
@@ -402,19 +338,12 @@ const seed = async () => {
       }
     }
 
-    // 6. Also link these liked songs to user '123' if registered
-    const user123 = await User.findOne({ username: '123' });
-    if (user123) {
-      user123.likedSongs = savedSongs.slice(0, 8).map(s => s._id);
-      await user123.save();
-      console.log('✅ Added curated favorites to user 123 profile');
-    }
-
-    console.log(`✨ Successfully seeded Spotify-inspired catalogue:`);
-    console.log(`   - ${savedArtists.length} Artists (Brent Faiyaz, Frank Ocean, Bryson Tiller, Kehlani, PARTYNEXTDOOR, etc.)`);
+    console.log(`✨ Successfully seeded:`);
+    console.log(`   - ${savedArtists.length} Artists`);
     console.log(`   - ${savedAlbums.length} Albums`);
-    console.log(`   - ${savedSongs.length} Playable Stream Tracks`);
-    console.log(`   - 2 Playlists (including "Liked Songs")`);
+    console.log(`   - ${savedSongs.length} Songs`);
+    console.log(`   - 2 Public Playlists`);
+    console.log(`   - Demo Curator Account (username: curator, password: curator1234)`);
 
     await mongoose.disconnect();
     process.exit(0);
