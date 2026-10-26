@@ -49,7 +49,7 @@
       "source": "/(.*)",
       "destination": {
         "service": "laya",
-        "path": "/index.html"
+        "path": "/"
       }
     }
   ]
