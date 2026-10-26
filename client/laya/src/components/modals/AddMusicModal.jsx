@@ -61,6 +61,12 @@ export function AddMusicModal() {
     if (!file) return;
 
     setAudioFile(file);
+    if (file.size > 4.2 * 1024 * 1024) {
+      setError(`Notice: Selected audio is ${(file.size / (1024 * 1024)).toFixed(2)} MB. Vercel serverless functions enforce a 4.5 MB request ceiling. Please choose a track under 4.2 MB or use the "Audio URL / Stream" tab.`);
+    } else {
+      setError(null);
+    }
+
     if (!title) {
       const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
       setTitle(cleanName);
@@ -104,9 +110,15 @@ export function AddMusicModal() {
       return;
     }
 
-    if (activeTab === 'upload' && !audioFile) {
-      setError('Please select an audio file to upload');
-      return;
+    if (activeTab === 'upload') {
+      if (!audioFile) {
+        setError('Please select an audio file to upload');
+        return;
+      }
+      if (audioFile.size > 4.2 * 1024 * 1024) {
+        setError(`"${audioFile.name}" is ${(audioFile.size / (1024 * 1024)).toFixed(2)} MB, exceeding Vercel's 4.5 MB serverless limit. Please select a file under 4.2 MB or use the "Audio URL / Stream" tab.`);
+        return;
+      }
     }
 
     if (activeTab === 'url' && !audioUrl.trim()) {
@@ -249,7 +261,7 @@ export function AddMusicModal() {
                 ) : (
                   <div>
                     <span className="text-ink font-serif italic text-sm block">Click to select or drag audio file here</span>
-                    <span className="text-[10px] text-ink-soft">Supports MP3, WAV, FLAC, M4A up to 80MB</span>
+                    <span className="text-[10px] text-ink-soft">Direct upload up to 4.2 MB (use "Audio URL" tab for larger files)</span>
                   </div>
                 )}
               </div>

@@ -70,7 +70,17 @@ export async function request(endpoint, options = {}) {
     }
 
     if (!res.ok) {
-      const errorMsg = data?.message || data?.error || res.statusText || 'Request failed';
+      let errorMsg = data?.message || data?.error;
+      if (!errorMsg && typeof data === 'string' && data.trim()) {
+        errorMsg = data.includes('FUNCTION_PAYLOAD_TOO_LARGE')
+          ? 'File exceeds Vercel’s 4.5 MB serverless upload limit. Please use a file under 4.2 MB or use the Audio URL tab.'
+          : data.trim();
+      }
+      if (!errorMsg) {
+        errorMsg = res.status === 413
+          ? 'File exceeds Vercel’s 4.5 MB serverless upload limit. Please use a file under 4.2 MB or use the Audio URL tab.'
+          : res.statusText || 'Request failed';
+      }
       throw new ApiError(errorMsg, res.status, data);
     }
 
