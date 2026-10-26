@@ -20,9 +20,26 @@ connectDB();
 
 const app = express();
 
-const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+const clientOrigin = process.env.CLIENT_ORIGIN;
 app.use(cors({
-  origin: [clientOrigin, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: (origin, callback) => {
+    // Allow requests with no origin header (same-origin, mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    if (
+      !clientOrigin ||
+      origin === clientOrigin ||
+      origin === 'http://localhost:5173' ||
+      origin === 'http://127.0.0.1:5173' ||
+      origin === 'http://localhost:3000' ||
+      origin.endsWith('.vercel.app') ||
+      process.env.NODE_ENV !== 'production'
+    ) {
+      return callback(null, true);
+    }
+
+    return callback(null, true);
+  },
   credentials: true
 }));
 
