@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+import connectDB from '../config/db.js';
 import Song from '../models/Song.js';
 import Artist from '../models/Artist.js';
 import Album from '../models/Album.js';
@@ -85,7 +87,21 @@ export const createSong = async (req, res, next) => {
     let finalAudioUrl = directAudioUrl?.trim();
     if (req.files && req.files.audioFile && req.files.audioFile[0]) {
       const audioFile = req.files.audioFile[0];
-      finalAudioUrl = `/uploads/audio/${audioFile.filename}`;
+      const mongooseInstance = await connectDB();
+      const db = mongooseInstance.connection ? mongooseInstance.connection.db : mongooseInstance.db;
+      const bucket = new mongoose.mongo.GridFSBucket(db, { bucketName: 'audio' });
+
+      const uploadStream = bucket.openUploadStream(audioFile.originalname, {
+        contentType: audioFile.mimetype || 'audio/mpeg'
+      });
+
+      await new Promise((resolve, reject) => {
+        uploadStream.end(audioFile.buffer);
+        uploadStream.on('finish', resolve);
+        uploadStream.on('error', reject);
+      });
+
+      finalAudioUrl = `/api/songs/audio/${uploadStream.id}`;
     }
 
     if (!finalAudioUrl) {
@@ -96,7 +112,8 @@ export const createSong = async (req, res, next) => {
     let finalCoverUrl = directCoverUrl?.trim();
     if (req.files && req.files.coverFile && req.files.coverFile[0]) {
       const coverFile = req.files.coverFile[0];
-      finalCoverUrl = `/uploads/covers/${coverFile.filename}`;
+      const mime = coverFile.mimetype || 'image/jpeg';
+      finalCoverUrl = `data:${mime};base64,${coverFile.buffer.toString('base64')}`;
     }
     if (!finalCoverUrl) {
       finalCoverUrl = 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=600&auto=format&fit=crop&q=80';
@@ -173,6 +190,61 @@ export const deleteSong = async (req, res, next) => {
   }
 };
 
+// GET /api/songs/audio/:fileId - stream audio directly from MongoDB GridFS with HTTP Range support
+export const streamAudioById = async (req, res, next) => {
+  try {
+    const { fileId } = req.params;
+    if (!fileId || !mongoose.Types.ObjectId.isValid(fileId)) {
+      return res.status(400).json({ message: 'Invalid audio file ID' });
+    }
+
+    const mongooseInstance = await connectDB();
+    const db = mongooseInstance.connection ? mongooseInstance.connection.db : mongooseInstance.db;
+    const bucket = new mongoose.mongo.GridFSBucket(db, { bucketName: 'audio' });
+
+    const objId = new mongoose.Types.ObjectId(fileId);
+    const files = await bucket.find({ _id: objId }).toArray();
+    if (!files || files.length === 0) {
+      return res.status(404).json({ message: 'Audio file not found in database' });
+    }
+
+    const file = files[0];
+    const fileSize = file.length;
+    const range = req.headers.range;
+    const contentType = file.contentType || 'audio/mpeg';
+
+    if (range) {
+      const parts = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+      if (start >= fileSize || end >= fileSize) {
+        res.status(416).set('Content-Range', `bytes */${fileSize}`);
+        return res.end();
+      }
+
+      const chunkSize = end - start + 1;
+      res.writeHead(206, {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunkSize,
+        'Content-Type': contentType
+      });
+
+      bucket.openDownloadStream(objId, { start, end: end + 1 }).pipe(res);
+    } else {
+      res.writeHead(200, {
+        'Content-Length': fileSize,
+        'Accept-Ranges': 'bytes',
+        'Content-Type': contentType
+      });
+      bucket.openDownloadStream(objId).pipe(res);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
 // GET /api/songs/:id/stream - stream audio file with range support
 export const streamSong = async (req, res, next) => {
   try {
@@ -182,6 +254,11 @@ export const streamSong = async (req, res, next) => {
     }
 
     let audioPath = song.audioUrl;
+    if (audioPath.startsWith('/api/songs/audio/')) {
+      req.params.fileId = audioPath.replace('/api/songs/audio/', '');
+      return streamAudioById(req, res, next);
+    }
+
     if (audioPath.startsWith('http://') || audioPath.startsWith('https://')) {
       return res.redirect(audioPath);
     }

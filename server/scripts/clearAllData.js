@@ -27,7 +27,7 @@ import fs from 'fs';
 
 const clearAll = async () => {
   try {
-    await mongoose.connect(mongoUri, { family: 4 });
+    await mongoose.connect(mongoUri);
     console.log('✅ Connected to MongoDB. Clearing all music and catalogue data...');
 
     const songCount = await Song.countDocuments();
@@ -48,6 +48,14 @@ const clearAll = async () => {
     console.log(`🧹 Deleted ${artistCount} artists`);
     console.log(`🧹 Deleted ${playlistCount} playlists`);
     console.log(`🧹 Deleted ${eventCount} listening events`);
+
+    // Drop GridFS audio files & chunks
+    try {
+      const db = mongoose.connection.db;
+      await db.collection('audio.files').drop().catch(() => {});
+      await db.collection('audio.chunks').drop().catch(() => {});
+      console.log('🧹 Purged GridFS audio collections');
+    } catch (_) {}
 
     // Clean uploads directory
     const uploadsDir = path.resolve(__dirname, '../uploads');
