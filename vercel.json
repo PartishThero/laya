@@ -39,9 +39,17 @@
       }
     },
     {
+      "source": "/assets/(.*)",
+      "destination": {
+        "service": "laya",
+        "path": "/assets/$1"
+      }
+    },
+    {
       "source": "/(.*)",
       "destination": {
-        "service": "laya"
+        "service": "laya",
+        "path": "/index.html"
       }
     }
   ]
