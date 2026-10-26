@@ -33,9 +33,6 @@ export function placeCardsInChunk(cards, cx, cy, sessionSeed = 'laya') {
     const jitterX = seededRandomRange(rng, -jitterFactorX, jitterFactorX);
     const jitterY = seededRandomRange(rng, -jitterFactorY, jitterFactorY);
 
-    // Physical vinyl rotation between -6 and +6 degrees
-    const tilt = seededRandomRange(rng, -6, 6);
-
     const anchorX = paddingX + col * stepX + (stepX - size.width) / 2;
     const anchorY = paddingY + row * stepY + (stepY - size.height) / 2;
 
@@ -48,7 +45,7 @@ export function placeCardsInChunk(cards, cx, cy, sessionSeed = 'laya') {
       localY,
       worldX: cx * CHUNK_WIDTH + localX,
       worldY: cy * CHUNK_HEIGHT + localY,
-      tilt: Math.round(tilt * 10) / 10,
+      tilt: 0,
       zIndex: idx + 1
     };
   });

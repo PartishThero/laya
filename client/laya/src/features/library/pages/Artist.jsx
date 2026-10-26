@@ -18,7 +18,7 @@ export default function Artist() {
   useEffect(() => {
     catalogueApi.getArtist(id)
       .then(res => {
-        setArtist(res);
+        setArtist(res?.artist || res);
         return Promise.all([
           catalogueApi.getSongs({ artist: id }),
           catalogueApi.getAlbums({ artist: id })
@@ -100,7 +100,7 @@ export default function Artist() {
               <Card
                 key={alb.id}
                 card={alb}
-                tilt={(idx % 2 === 0 ? 1 : -1) * 2}
+                tilt={0}
                 onClick={() => playCard(alb, albums)}
               />
             ))}
@@ -119,7 +119,7 @@ export default function Artist() {
               <Card
                 key={song.id}
                 card={song}
-                tilt={(idx % 2 === 0 ? -1.5 : 1.5)}
+                tilt={0}
                 onClick={() => playCard(song, songs)}
               />
             ))}

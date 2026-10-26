@@ -71,7 +71,7 @@ export const Card = React.memo(function Card({ card, tilt = 0, onClick, onPanCan
   };
 
   if (isBeingDragged) {
-    return <CardGhost kind={card.kind} tilt={tilt} />;
+    return null;
   }
 
   // Song + album cards are squircles (VinylCard), playlist keeps the folder look
@@ -88,9 +88,8 @@ export const Card = React.memo(function Card({ card, tilt = 0, onClick, onPanCan
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onKeyDown={handleKeyDown}
-      className={`relative cursor-pointer touch-none outline-none focus-visible:ring-2 focus-visible:ring-accent transition-transform duration-200 hover:rotate-0 hover:-translate-y-1 active:scale-[0.97] ${radius}`}
+      className={`relative cursor-pointer touch-none outline-none focus-visible:ring-2 focus-visible:ring-accent transition-transform duration-200 hover:-translate-y-1 active:scale-[0.97] ${radius}`}
       style={{
-        transform: `rotate(${tilt}deg)`,
         willChange: 'transform'
       }}
     >

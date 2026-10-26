@@ -21,7 +21,13 @@ export function useCardPositions(mode = 'home') {
           localStorage.setItem(storageKey, legacy);
         }
       }
-      return saved ? JSON.parse(saved) : {};
+      if (!saved) return {};
+      const parsed = JSON.parse(saved);
+      const normalized = {};
+      Object.entries(parsed).forEach(([id, item]) => {
+        normalized[id] = { ...item, tilt: 0 };
+      });
+      return normalized;
     } catch {
       return {};
     }
@@ -41,10 +47,14 @@ export function useCardPositions(mode = 'home') {
         }
       }
       const parsed = saved ? JSON.parse(saved) : {};
-      setPositions(parsed);
+      const normalized = {};
+      Object.entries(parsed).forEach(([id, item]) => {
+        normalized[id] = { ...item, tilt: 0 };
+      });
+      setPositions(normalized);
 
       let maxZ = 100;
-      Object.values(parsed).forEach(item => {
+      Object.values(normalized).forEach(item => {
         if (item.zIndex && item.zIndex > maxZ) {
           maxZ = item.zIndex;
         }
@@ -56,7 +66,7 @@ export function useCardPositions(mode = 'home') {
   }, [storageKey, mode]);
 
   // Place or move a card to an arbitrary world coordinate
-  const moveCard = useCallback((card, worldX, worldY, tilt = 0) => {
+  const moveCard = useCallback((card, worldX, worldY) => {
     highestZIndexRef.current += 1;
     const nextZ = highestZIndexRef.current;
 
@@ -67,7 +77,7 @@ export function useCardPositions(mode = 'home') {
           card,
           worldX: Math.round(worldX),
           worldY: Math.round(worldY),
-          tilt: Math.round(tilt * 10) / 10,
+          tilt: 0,
           zIndex: nextZ
         }
       };

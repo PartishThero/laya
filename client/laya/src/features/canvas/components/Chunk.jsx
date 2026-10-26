@@ -21,9 +21,9 @@ export function Chunk({ cx, cy, placedCards, isLoading, onCardClick, onPanCanvas
 
       {isLoading && (!placedCards || placedCards.length === 0) ? (
         <div className="relative w-full h-full p-10 flex flex-wrap gap-8 items-center justify-center">
-          <CardSkeleton kind="song" tilt={-2} />
-          <CardSkeleton kind="album" tilt={3} />
-          <CardSkeleton kind="song" tilt={1} />
+          <CardSkeleton kind="song" tilt={0} />
+          <CardSkeleton kind="album" tilt={0} />
+          <CardSkeleton kind="song" tilt={0} />
         </div>
       ) : (
         placedCards?.map((item) => (
@@ -37,7 +37,7 @@ export function Chunk({ cx, cy, placedCards, isLoading, onCardClick, onPanCanvas
           >
             <Card
               card={item.card}
-              tilt={item.tilt}
+              tilt={0}
               onClick={onCardClick}
               onPanCanvas={onPanCanvas}
             />

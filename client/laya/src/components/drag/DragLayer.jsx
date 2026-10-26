@@ -49,7 +49,6 @@ export function DragLayer() {
   const isOverTarget = status === DRAG_STATES.OVER_TARGET || status === DRAG_STATES.DROPPED_PENDING;
   const offsetX = origin?.offsetX ?? 100;
   const offsetY = origin?.offsetY ?? 100;
-  const tilt = isOverTarget ? 0 : (origin?.tilt ?? 2);
 
   return (
     <div
@@ -61,7 +60,7 @@ export function DragLayer() {
         style={{
           transform: `translate3d(${current.screenX - offsetX}px, ${current.screenY - offsetY}px, 0) scale(${
             isOverTarget ? 0.92 : 1.05
-          }) rotate(${tilt}deg)`,
+          })`,
           filter: 'drop-shadow(0 20px 36px rgba(0,0,0,0.26))'
         }}
       >

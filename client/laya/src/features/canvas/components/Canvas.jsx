@@ -51,7 +51,7 @@ export function Canvas({ mode = 'home' }) {
       const screenTop = current.screenY - offsetY;
 
       const world = screenToWorld(screenLeft, screenTop, vp);
-      moveCard(card, world.x, world.y, origin?.tilt ?? 0);
+      moveCard(card, world.x, world.y);
       return true;
     };
 
@@ -250,7 +250,7 @@ export function Canvas({ mode = 'home' }) {
               >
                 <Card
                   card={item.card}
-                  tilt={item.tilt}
+                  tilt={0}
                   onClick={(c) => playCard(c, allCardsList)}
                   onPanCanvas={panBy}
                 />

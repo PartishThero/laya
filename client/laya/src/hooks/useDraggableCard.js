@@ -39,11 +39,11 @@ export function useDraggableCard({ card, onClick, tilt = 0, onPanCanvas }) {
         offsetY: grab.offsetY,
         width: grab.width,
         height: grab.height,
-        tilt
+        tilt: 0
       },
       onPanCanvas
     );
-  }, [card, tilt, onPanCanvas]);
+  }, [card, onPanCanvas]);
 
   const handlePointerDown = useCallback((e) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return;

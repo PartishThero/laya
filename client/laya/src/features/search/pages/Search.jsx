@@ -113,7 +113,7 @@ export default function Search() {
                   <Card
                     key={card.id}
                     card={card}
-                    tilt={(idx % 2 === 0 ? 1 : -1) * 1.5}
+                    tilt={0}
                     onClick={() => playCard(card, results.songs)}
                   />
                 ))}
@@ -132,7 +132,7 @@ export default function Search() {
                   <Card
                     key={card.id}
                     card={card}
-                    tilt={(idx % 2 === 0 ? -1 : 1) * 2}
+                    tilt={0}
                     onClick={() => playCard(card, results.albums)}
                   />
                 ))}

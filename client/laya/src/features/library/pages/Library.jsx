@@ -124,7 +124,7 @@ export default function Library() {
                   <Card
                     key={card.id}
                     card={card}
-                    tilt={(idx % 2 === 0 ? 1 : -1) * 2}
+                    tilt={0}
                     onClick={() => playCard(card)}
                   />
                 );
@@ -149,7 +149,7 @@ export default function Library() {
                 <Card
                   key={song.id}
                   card={song}
-                  tilt={(idx % 2 === 0 ? -1.5 : 1.5)}
+                  tilt={0}
                   onClick={() => playCard(song, likes)}
                 />
               ))}
@@ -173,7 +173,7 @@ export default function Library() {
                 <Card
                   key={`${song.id}-${idx}`}
                   card={song}
-                  tilt={(idx % 2 === 0 ? 1 : -1) * 1.5}
+                  tilt={0}
                   onClick={() => playCard(song, history)}
                 />
               ))}

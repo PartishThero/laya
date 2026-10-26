@@ -22,7 +22,7 @@ export default function Album() {
 
   useEffect(() => {
     catalogueApi.getAlbum(id)
-      .then(setAlbum)
+      .then(res => setAlbum(res?.album ? { ...res.album, tracks: res.tracks || [] } : res))
       .catch(err => setError(err.message || 'Album not found'))
       .finally(() => setLoading(false));
   }, [id]);

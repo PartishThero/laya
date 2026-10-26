@@ -45,8 +45,10 @@ export const getAlbumById = async (req, res, next) => {
       .populate('artist', 'name')
       .sort({ createdAt: 1 });
 
+    const albumObj = album.toObject ? album.toObject() : album;
     res.json({
-      album,
+      ...albumObj,
+      album: albumObj,
       tracks
     });
   } catch (err) {

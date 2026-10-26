@@ -44,8 +44,10 @@ export const getArtistById = async (req, res, next) => {
       Album.find({ artist: artist._id })
     ]);
 
+    const artistObj = artist.toObject ? artist.toObject() : artist;
     res.json({
-      artist,
+      ...artistObj,
+      artist: artistObj,
       songs,
       albums
     });

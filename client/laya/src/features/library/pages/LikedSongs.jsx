@@ -70,7 +70,7 @@ export default function LikedSongs() {
             <Card
               key={song.id}
               card={song}
-              tilt={(idx % 2 === 0 ? 1 : -1) * 2}
+              tilt={0}
               onClick={() => playCard(song, songs)}
             />
           ))}

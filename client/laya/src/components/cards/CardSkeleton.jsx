@@ -2,12 +2,11 @@
 import React from 'react';
 import { cardSize } from '@/models/card.model.js';
 
-export function CardSkeleton({ kind = 'song', tilt = 0 }) {
+export function CardSkeleton({ kind = 'song' }) {
   const size = cardSize(kind);
   const style = {
     width: `${size.width}px`,
-    height: `${size.height}px`,
-    transform: `rotate(${tilt}deg)`
+    height: `${size.height}px`
   };
 
   // Song + album cards are square squircles now
