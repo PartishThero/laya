@@ -6,6 +6,14 @@ Instead of scrolling through standard playlist tables and algorithmic feeds, Lay
 
 ---
 
+## Video Demo
+
+A video demonstration of Laya is available on Google Drive:
+
+- [Laya Video Demo](https://drive.google.com/drive/folders/1Z0ogMhcYLjg2klp8MNJulyohOXqqD4Qb?usp=sharing)
+
+---
+
 ## Features
 
 - **Infinite Canvas**: Pan and zoom freely across your records, vinyl sleeves, and tracks.
